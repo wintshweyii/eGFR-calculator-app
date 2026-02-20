@@ -1,0 +1,102 @@
+[
+  {
+    "id": "ckd",
+    "title": "CKD-EPI 2021",
+    "usage": [
+      "Used to estimate kidney function (eGFR).",
+      "Helps detect chronic kidney disease (CKD).",
+      "Used for CKD staging.",
+      "Guides medication dose adjustment.",
+      "Used for monitoring kidney function over time.",
+      "Used to estimate kidney function (eGFR).",
+      "Helps detect chronic kidney disease (CKD).",
+      "Used for CKD staging.",
+      "Guides medication dose adjustment.",
+      "Used for monitoring kidney function over time.",
+      "Used to estimate kidney function (eGFR).",
+      "Helps detect chronic kidney disease (CKD).",
+      "Used for CKD staging.",
+      "Guides medication dose adjustment.",
+      "Used for monitoring kidney function over time.",
+      "Used to estimate kidney function (eGFR).",
+      "Helps detect chronic kidney disease (CKD).",
+      "Used for CKD staging.",
+      "Guides medication dose adjustment.",
+      "Used for monitoring kidney function over time.",
+      "Used to estimate kidney function (eGFR).",
+      "Helps detect chronic kidney disease (CKD).",
+      "Used for CKD staging.",
+      "Guides medication dose adjustment.",
+      "Used for monitoring kidney function over time.",
+      "Used to estimate kidney function (eGFR).",
+      "Helps detect chronic kidney disease (CKD).",
+      "Used for CKD staging.",
+      "Guides medication dose adjustment.",
+      "Used for monitoring kidney function over time.",
+      "Used to estimate kidney function (eGFR).",
+      "Helps detect chronic kidney disease (CKD).",
+      "Used for CKD staging.",
+      "Guides medication dose adjustment.",
+      "Used for monitoring kidney function over time.",
+      "Used to estimate kidney function (eGFR).",
+      "Helps detect chronic kidney disease (CKD).",
+      "Used for CKD staging.",
+      "Guides medication dose adjustment.",
+      "Used for monitoring kidney function over time."
+    ],
+    "formula": "Expressed as a single equation:\n\neGFRcr = 142 x min(Scr/κ, 1)^α x max(Scr/κ, 1)^-1.200 x 0.9938^Age x 1.012 [if female]\n\nwhere:\nScr = standardized serum creatinine in mg/dL\nκ = 0.7 (females) or 0.9 (males)\nα = -0.241 (female) or -0.302 (male)\nmin(Scr/κ, 1) is the minimum of Scr/κ or 1.0\nmax(Scr/κ, 1) is the maximum of Scr/κ or 1.0\nAge (years)"
+  },
+  {
+    "id": "bedside",
+    "title": "Bedside Schwartz",
+    "usage": [
+      "Used to estimate eGFR in children.",
+      "Common in pediatric practice.",
+      "Used when height is available.",
+      "Helpful in pediatric CKD monitoring."
+    ],
+    "formula": "eGFR = (0.413 × Height in cm) / Serum Creatinine in mg/dL"
+  },
+{
+  "id": "general",
+  "info": {
+    "definition": [
+      "eGFR is an estimate of how well your kidneys are filtering blood.",
+      " It measures the rate at which your kidneys remove waste and excess fluid, using blood creatinine levels, age, sex, and sometimes race.",
+      " Units: milliliters per minute per 1.73 m² of body surface area (mL/min/1.73 m²)."
+    ],
+    "units": "mL/min/1.73 m²",
+    "importance": [
+      "Detects kidney disease early.",
+      " Monitors progression of chronic kidney disease (CKD).",
+      " Guides medication dosing and treatment decisions."
+    ],
+    "calculation_methods": [
+      "\nThere are multiple formulas, including:",
+      "\n\nCKD-EPI (2021): \nPreferred method using serum creatinine, age, and sex. \nMore accurate at higher kidney function.",
+      "\n\nMDRD: Older method, less accurate in normal or near-normal kidney function.",
+      "\n\nBedside Schwartz: Used for children. \nUses height and serum creatinine."
+    ],
+    "normal_ranges": [
+      "\n>= 90: Normal\n\n",
+      "60-89: Mildly decreased\n\n",
+      "45-59: Mild to moderate decrease\n\n",
+      "30-44: Moderate to severe decrease\n\n",
+      "15-29: Severe decrease\n\n",
+      "< 15: Kidney failure"
+    ],
+    "factors_affecting_eGFR": [
+      "\nSerum creatinine levels (affected by muscle mass, diet, medications)\n\n",
+      "Age (eGFR declines with age)\n\n",
+      "Sex (women generally have lower creatinine)\n\n",
+      "Race (previous equations included race; new CKD-EPI does not require it)\n\n",
+      "Hydration status and lab variability\n\n"
+    ],
+    "limitations": [
+      "\neGFR is an estimate, not a precise measurement\n\n",
+      "May be inaccurate in very muscular or frail people, pregnancy, or rapid kidney function changes\n\n",
+      "Should always be interpreted alongside clinical context and other lab results"
+    ]
+  }
+}
+]
