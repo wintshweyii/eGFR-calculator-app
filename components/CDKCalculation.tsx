@@ -1,22 +1,49 @@
+import { useCDK } from '@/contexts/CKDContext';
 import React, { useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 const CDKCalculation = () => {
+  const { calculateEGFR } = useCDK();
+
   const [scr, setScr] = useState('');
   const [age, setAge] = useState('');
-  const [creatinineUnit, setUnit] = useState('mg/dL');
-  const [gender, setGender] = useState('Male');
+  const [creatinineUnit, setUnit] = useState<'mg/dL' | 'µmol/L'>('mg/dL');
+  const [gender, setGender] = useState<'Male' | 'Female'>('Male');
   const [result, setResult] = useState(0);
+  const [grade, setGrade] = useState('');
+
+  const handleCalculate = async () => {
+    if (!scr || !age) return;
+
+    const { egfr, grade } = await calculateEGFR({
+      serumCreatinine: Number(scr),
+      age: Number(age),
+      sex: gender,
+      unit: creatinineUnit,
+    });
+
+    setResult(egfr);
+    setGrade(grade);
+  };
+
+  const clearResult = () => {
+    setResult(0);
+    setGrade('');
+  };
 
   return (
     <View style={styles.container}>
+
       <View style={styles.inputBox}>
         <Text style={styles.label}>S cr</Text>
         <View style={styles.inputRow}>
           <TextInput
             style={styles.input}
             value={scr}
-            onChangeText={setScr}
+            onChangeText={(text) => {
+              setScr(text);
+              clearResult();
+            }}
             keyboardType="numeric"
             returnKeyType="done"
             onSubmitEditing={() => Keyboard.dismiss()}
@@ -24,9 +51,10 @@ const CDKCalculation = () => {
           />
           <Pressable
             style={styles.unitBtn}
-            onPress={() =>
-              setUnit(creatinineUnit === 'mg/dL' ? 'µmol/L' : 'mg/dL')
-            }
+            onPress={() => {
+              setUnit(creatinineUnit === 'mg/dL' ? 'µmol/L' : 'mg/dL');
+              clearResult()
+            }}
           >
             <Text style={styles.unitText}>{creatinineUnit} ▼</Text>
           </Pressable>
@@ -39,7 +67,10 @@ const CDKCalculation = () => {
           <TextInput
             style={styles.input}
             value={age}
-            onChangeText={setAge}
+            onChangeText={(text) => {
+              setAge(text);
+              clearResult();
+            }}
             keyboardType="numeric"
             returnKeyType="done"
             onSubmitEditing={() => Keyboard.dismiss()}
@@ -59,7 +90,7 @@ const CDKCalculation = () => {
               styles.genderBtn,
               gender === 'Male' && styles.genderActive,
             ]}
-            onPress={() => setGender('Male')}
+            onPress={() => {setGender('Male'); clearResult()}}
           >
             <Text
               style={[
@@ -70,12 +101,13 @@ const CDKCalculation = () => {
               Male
             </Text>
           </Pressable>
+
           <Pressable
             style={[
               styles.genderBtn,
               gender === 'Female' && styles.genderActive,
             ]}
-            onPress={() => setGender('Female')}
+            onPress={() => {setGender('Female'); clearResult()}}
           >
             <Text
               style={[
@@ -89,23 +121,37 @@ const CDKCalculation = () => {
         </View>
       </View>
 
+
       <View style={styles.resultBox}>
         <Text style={styles.resultLabel}>eGFR Result:</Text>
-        <Text style={styles.resultValue}>{result} ml/min/1.73 m²</Text>
+        <Text style={styles.resultValue}>
+          {result} ml/min/1.73 m²
+        </Text>
+        {grade ? (
+          <Text style={{ marginTop: 6, fontWeight: '500', color: '#1691E9' }}>
+            {grade}
+          </Text>
+        ) : null}
       </View>
 
       <View style={styles.btnRow}>
-        <Pressable style={[styles.btn, styles.clearBtn]} onPress={() => {
-          setScr('');
-          setAge('');
-          setGender('Male');
-          setResult(0);
-        }}>
+        <Pressable
+          style={[styles.btn, styles.clearBtn]}
+          onPress={() => {
+            setScr('');
+            setAge('');
+            setGender('Male');
+            setResult(0);
+            setGrade('');
+          }}
+        >
           <Text style={styles.btnText}>Clear</Text>
         </Pressable>
-        <Pressable style={[styles.btn, styles.calcBtn]} onPress={() => {
-          setResult(90); 
-        }}>
+
+        <Pressable
+          style={[styles.btn, styles.calcBtn]}
+          onPress={handleCalculate}
+        >
           <Text style={styles.btnText}>Calculate</Text>
         </Pressable>
       </View>
@@ -204,7 +250,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 20,
     alignItems: 'center',
-    height: 80,
+    height: 110,
     justifyContent: 'center'
   },
   resultLabel: {

@@ -1,12 +1,55 @@
+import { useBedside } from '@/contexts/BedsideContext';
 import React, { useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 const BedsideCalculation = () => {
+  const { calculateBedsideEGFR } = useBedside();
+
   const [scr, setScr] = useState('');
-  const [creatinineUnit, setUnit] = useState('mg/dl');
+  const [creatinineUnit, setCreatinineUnit] = useState<'mg/dL' | 'µmol/L'>('mg/dL');
   const [height, setHeight] = useState('');
-  const [heightUnit, setHeightUnit] = useState('cm');
+  const [heightUnit, setHeightUnit] = useState<'cm' | 'inch'>('cm');
   const [result, setResult] = useState(0);
+  const [grade, setGrade] = useState('');
+
+  const handleScrChange = (val: string) => {
+    setScr(val);
+    setResult(0);
+    setGrade('');
+  };
+
+  const handleHeightChange = (val: string) => {
+    setHeight(val);
+    setResult(0);
+    setGrade('');
+  };
+
+  const handleCalculate = async() => {
+    if (!scr || !height) return;
+
+    const { egfr, grade } = await calculateBedsideEGFR({
+      height: Number(height),
+      heightUnit,
+      serumCreatinine: Number(scr),
+      unit: creatinineUnit,
+    });
+
+    setResult(egfr);
+    setGrade(grade);
+  };
+
+  const handleClear = () => {
+    setScr('');
+    setHeight('');
+    setResult(0);
+    setGrade('');
+    setCreatinineUnit('mg/dL');
+    setHeightUnit('cm');
+  };
+    const clearResult = () => {
+    setResult(0);
+    setGrade('');
+  };
 
   return (
     <View style={styles.container}>
@@ -17,7 +60,7 @@ const BedsideCalculation = () => {
           <TextInput
             style={styles.input}
             value={scr}
-            onChangeText={setScr}
+            onChangeText={handleScrChange}
             keyboardType="numeric"
             returnKeyType="done"
             onSubmitEditing={() => Keyboard.dismiss()}
@@ -25,14 +68,13 @@ const BedsideCalculation = () => {
           />
           <Pressable
             style={styles.unitBtn}
-            onPress={() =>
-              setUnit(creatinineUnit === 'mg/dL' ? 'µmol/L' : 'mg/dL')
-            }
+            onPress={() => {setCreatinineUnit(creatinineUnit === 'mg/dL' ? 'µmol/L' : 'mg/dL'); clearResult()}}
           >
             <Text style={styles.unitText}>{creatinineUnit} ▼</Text>
           </Pressable>
         </View>
       </View>
+
 
       <View style={styles.inputBox}>
         <Text style={styles.label}>Height</Text>
@@ -40,47 +82,39 @@ const BedsideCalculation = () => {
           <TextInput
             style={styles.input}
             value={height}
-            onChangeText={setHeight}
+            onChangeText={handleHeightChange}
             keyboardType="numeric"
             placeholder="0"
           />
           <Pressable
             style={styles.unitBtn}
-            onPress={() =>
-              setHeightUnit(heightUnit === 'cm' ? 'in' : 'cm')
-            }
+            onPress={() => {setHeightUnit(heightUnit === 'cm' ? 'inch' : 'cm'); clearResult()}}
           >
             <Text style={styles.unitText}>{heightUnit} ▼</Text>
           </Pressable>
-
         </View>
       </View>
+
 
       <View style={styles.resultBox}>
         <Text style={styles.resultLabel}>eGFR Result:</Text>
         <Text style={styles.resultValue}>
           {result} ml/min/1.73 m²
         </Text>
+        {grade ? (
+          <Text style={{ marginTop: 6, fontWeight: '500', color: '#1691E9' }}>
+            {grade}
+          </Text>
+        ) : null}
       </View>
 
+
       <View style={styles.btnRow}>
-        <Pressable
-          style={styles.btn}
-          onPress={() => {
-            setScr('');
-            setHeight('');
-            setResult(0);
-          }}
-        >
+        <Pressable style={styles.btn} onPress={handleClear}>
           <Text style={styles.btnText}>Clear</Text>
         </Pressable>
 
-        <Pressable
-          style={styles.btn}
-          onPress={() => {
-            setResult(90);
-          }}
-        >
+        <Pressable style={styles.btn} onPress={handleCalculate}>
           <Text style={styles.btnText}>Calculate</Text>
         </Pressable>
       </View>
@@ -153,7 +187,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 20,
     alignItems: 'center',
-    height: 80,
+    height: 110,
     justifyContent: 'center'
   },
 

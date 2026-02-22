@@ -1,0 +1,8 @@
+[
+  { "grade": "G1", "min": 90, "max": 999, "description": "Normal or high" },
+  { "grade": "G2", "min": 60, "max": 89, "description": "Mildly decreased" },
+  { "grade": "G3a", "min": 45, "max": 59, "description": "Mild–moderate decrease" },
+  { "grade": "G3b", "min": 30, "max": 44, "description": "Moderate–severe decrease" },
+  { "grade": "G4", "min": 15, "max": 29, "description": "Severe decrease" },
+  { "grade": "G5", "min": 0, "max": 14, "description": "Kidney failure" }
+]

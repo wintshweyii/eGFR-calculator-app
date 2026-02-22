@@ -1,15 +1,25 @@
 import { HapticTab } from '@/components/haptic-tab';
 import { Colors } from '@/constants/theme';
+import { BedsideProvider } from '@/contexts/BedsideContext';
+import { CDKProvider } from '@/contexts/CKDContext';
+import { HistoryProvider } from '@/contexts/historyContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { initDatabase } from '@/services/database';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Tabs } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  useEffect(() => {
+    initDatabase();
+  }, []);
 
   return (
+    <HistoryProvider>
+    <BedsideProvider>
+    <CDKProvider>
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
@@ -57,7 +67,11 @@ export default function TabLayout() {
       }}
       />
     </Tabs>
+    </CDKProvider>
+    </BedsideProvider>
+    </HistoryProvider>
   );
+  
 }
 
 const styles = StyleSheet.create ({
@@ -77,7 +91,7 @@ const styles = StyleSheet.create ({
       paddingTop: 10,
       elevation: 5,
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     centerIcon: {
       width: 60,
