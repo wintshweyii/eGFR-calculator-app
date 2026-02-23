@@ -1,8 +1,7 @@
 import { useHistory } from '@/contexts/historyContext';
+import Octicons from '@expo/vector-icons/Octicons';
 import React, { useState } from 'react';
 import {
-  FlatList,
-  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,7 +9,7 @@ import {
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-const calculationMethods = ['All', 'CKD-EPI', 'Bedside Schwartz']; 
+const calculationMethods = ['All', 'CKD-EPI', 'Bedside Schwartz'];
 
 const Search = () => {
   const { filterHistory, loadHistory } = useHistory();
@@ -22,8 +21,6 @@ const Search = () => {
   const [fromPeriod, setFromPeriod] = useState<'AM' | 'PM'>('AM');
   const [toPeriod, setToPeriod] = useState<'AM' | 'PM'>('AM');
 
-
-  const [methodVisible, setMethodVisible] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState('All');
 
   const handleReset = async () => {
@@ -32,7 +29,7 @@ const Search = () => {
     setSelectedMethod('All');
     setFromPeriod('AM');
     setToPeriod('AM');
-    await loadHistory(); 
+    await loadHistory();
   };
 
   const handleConfirm = (date: Date) => {
@@ -40,22 +37,25 @@ const Search = () => {
 
     const isFrom = showPicker.includes('from');
     const isDate = showPicker.includes('Date');
-    const baseDate = isFrom ? (fromDate ? new Date(fromDate) : new Date()) : (toDate ? new Date(toDate) : new Date());
-    const period = isFrom ? fromPeriod : toPeriod;
 
     if (isDate) {
-      baseDate.setFullYear(date.getFullYear());
-      baseDate.setMonth(date.getMonth());
-      baseDate.setDate(date.getDate());
+      const newDate = new Date(date);
+      newDate.setHours(0, 0, 0, 0);
+      isFrom ? setFromDate(newDate) : setToDate(newDate);
     } else {
+      const currentDate = isFrom ? fromDate ?? new Date() : toDate ?? new Date();
+      const newDate = new Date(currentDate);
       let hours = date.getHours();
+      const period = isFrom ? fromPeriod : toPeriod;
+
       if (period === 'PM' && hours < 12) hours += 12;
       if (period === 'AM' && hours === 12) hours = 0;
-      baseDate.setHours(hours);
-      baseDate.setMinutes(date.getMinutes());
+
+      newDate.setHours(hours);
+      newDate.setMinutes(date.getMinutes());
+      isFrom ? setFromDate(newDate) : setToDate(newDate);
     }
 
-    isFrom ? setFromDate(baseDate) : setToDate(baseDate);
     setShowPicker(null);
   };
 
@@ -68,127 +68,60 @@ const Search = () => {
   return (
     <View style={styles.container}>
 
-      <Text style={styles.label}>From</Text>
-      <View style={styles.row}>
-        <TouchableOpacity
-          style={[styles.input, { width: 150 }]}
-          onPress={() => setShowPicker('fromDate')}
-        >
-          <Text>{formatDate(fromDate)}</Text>
+      <View style={styles.inlineRow}>
+        <Text style={styles.labelSmall}>From</Text>
+        <TouchableOpacity style={styles.compactInput} onPress={() => setShowPicker('fromDate')}>
+          <Text style={styles.inputText}>{formatDate(fromDate)}</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.input, { width: 70, marginHorizontal: 8 }]}
-          onPress={() => setShowPicker('fromTime')}
-        >
-          <Text>{formatTime(fromDate)}</Text>
+        <TouchableOpacity style={styles.compactInputSmall} onPress={() => setShowPicker('fromTime')}>
+          <Text style={styles.inputText}>{formatTime(fromDate)}</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.periodBoxSmall} onPress={() => setFromPeriod(prev => (prev === 'AM' ? 'PM' : 'AM'))}>
+          <Text style={styles.periodText}>{fromPeriod}</Text>
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.periodBox}>
-          <TouchableOpacity
-            onPress={() => setFromPeriod(prev => (prev === 'AM' ? 'PM' : 'AM'))}
-          >
-            <Text style={styles.periodText}>{fromPeriod} ▼</Text>
+      <View style={styles.inlineRow}>
+        <Text style={styles.labelSmall}>To</Text>
+        <TouchableOpacity style={styles.compactInput} onPress={() => setShowPicker('toDate')}>
+          <Text style={styles.inputText}>{formatDate(toDate)}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.compactInputSmall} onPress={() => setShowPicker('toTime')}>
+          <Text style={styles.inputText}>{formatTime(toDate)}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.periodBoxSmall} onPress={() => setToPeriod(prev => (prev === 'AM' ? 'PM' : 'AM'))}>
+          <Text style={styles.periodText}>{toPeriod}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.inlineRow}>
+        <Text style={styles.labelSmall}>Method</Text>
+        <TouchableOpacity
+          style={styles.methodDropdownCompact}
+          onPress={() => {
+            const currentIndex = calculationMethods.indexOf(selectedMethod);
+            const nextIndex = (currentIndex + 1) % calculationMethods.length;
+            setSelectedMethod(calculationMethods[nextIndex]);
+          }}
+        >
+          <Text style={styles.inputText}>{selectedMethod} ▼</Text>
+        </TouchableOpacity>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={[styles.button, styles.searchButton]} onPress={() => filterHistory({ method: selectedMethod, fromDate, toDate })}>
+            <Text style={styles.buttonText}><Octicons name="search" size={12} color="white" /> Filter</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.resetButton]} onPress={handleReset}>
+            <Text style={styles.buttonText}><Octicons name="filter-remove" size={12} color="white" /> Reset</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-
-      <Text style={styles.label}>To</Text>
-      <View style={styles.row}>
-        <TouchableOpacity
-          style={[styles.input, { width: 150 }]}
-          onPress={() => setShowPicker('toDate')}
-        >
-          <Text>{formatDate(toDate)}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.input, { width: 70, marginHorizontal: 8 }]}
-          onPress={() => setShowPicker('toTime')}
-        >
-          <Text>{formatTime(toDate)}</Text>
-        </TouchableOpacity>
-
-        <View style={styles.periodBox}>
-          <TouchableOpacity
-            onPress={() => setToPeriod(prev => (prev === 'AM' ? 'PM' : 'AM'))}
-          >
-            <Text style={styles.periodText}>{toPeriod} ▼</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-
-      <Text style={styles.label}>Calculation Method</Text>
-      <TouchableOpacity
-        style={[styles.input, { width: '50%' }]}
-        onPress={() => setMethodVisible(true)}
-      >
-        <Text>{selectedMethod}</Text>
-      </TouchableOpacity>
-
-      <Modal visible={methodVisible} transparent animationType="fade">
-        <View style={styles.modal}>
-          <FlatList
-            data={calculationMethods}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.option}
-                onPress={() => {
-                  setSelectedMethod(item);
-                  setMethodVisible(false);
-                }}
-              >
-                <Text>{item}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      </Modal>
-
-      <View style={{ flexDirection: 'row', marginTop: 10, width: '100%', justifyContent: 'space-between' }}>
-  
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#3FA1E8',
-            padding: 10,
-            borderRadius: 8,
-            width: '48%',
-          }}
-          onPress={() =>
-            filterHistory({
-              method: selectedMethod,
-              fromDate,
-              toDate,
-            })
-          }
-        >
-          <Text style={{ color: 'white', textAlign: 'center' }}>Search</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{
-            backgroundColor: '#E74C3C',
-            padding: 10,
-            borderRadius: 8,
-            width: '48%',
-          }}
-         onPress={handleReset}
-        >
-          <Text style={{ color: 'white', textAlign: 'center' }}>
-           Reset
-          </Text>
-        </TouchableOpacity>
-      </View>
       <DateTimePickerModal
         isVisible={showPicker !== null}
         mode={showPicker?.includes('Date') ? 'date' : 'time'}
         onConfirm={handleConfirm}
         onCancel={() => setShowPicker(null)}
       />
-
     </View>
   );
 };
@@ -197,52 +130,80 @@ export default Search;
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: '90%',
+    marginHorizontal: '5%',
+    paddingVertical: 10,
   },
-  label: {
-    marginTop: 5,
-    marginBottom: 6,
-    fontSize: 14,
-    color: '#000',
-    alignSelf: 'stretch',
-    textAlign: 'left',
-  },
-  row: {
+  inlineRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-    width: '100%',
+    marginBottom: 8,
   },
-  input: {
+  labelSmall: {
+    width: 50,
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#111',
+  },
+  compactInput: {
+    flex: 2,
     backgroundColor: '#fff',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginRight: 6,
+    alignItems: 'center',
+  },
+  compactInputSmall: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingVertical: 8,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginRight: 6,
+    alignItems: 'center',
+  },
+  periodBoxSmall: {
+    backgroundColor: '#3FA1E8',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  methodDropdownCompact: {
+    flex: 3,
+    // backgroundColor: '#F1F5F9',
+    backgroundColor: '#ffffff',
+    paddingVertical: 8,
+    borderRadius: 6,
+    paddingHorizontal: 10
+  },
+  inputText: {
+    color: '#333',
+    fontSize: 12,
+  },
+  periodText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 12,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    // marginTop: 10,
+    width: 110,
+    marginLeft: 10
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 8,
     borderRadius: 8,
     alignItems: 'center',
   },
-  periodBox: {
-    backgroundColor: '#3b82f6',
-    borderRadius: 10,
-    width: 70,
-    height: 38,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  periodText: {
-    color: 'white',
-    fontWeight: '600',
-  },
-  modal: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
-  option: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-  },
+    searchButton: { backgroundColor: '#3FA1E8', marginRight: 4 },
+    resetButton: { backgroundColor: '#3FA1E8'},
+    buttonText: { color: '#fff', fontWeight: '600', fontSize: 12 },
 });

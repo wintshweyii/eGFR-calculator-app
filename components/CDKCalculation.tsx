@@ -21,9 +21,12 @@ const CDKCalculation = () => {
       sex: gender,
       unit: creatinineUnit,
     });
-
     setResult(egfr);
     setGrade(grade);
+
+    // setScr('');
+    // setAge('');
+    // Keyboard.dismiss();
   };
 
   const clearResult = () => {

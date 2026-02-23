@@ -1,3 +1,4 @@
+import { showHistoryToast } from '@/components/toast';
 import grades from '@/data/cdkGrades.json';
 import { db } from '@/services/database';
 import React, { createContext, useContext } from 'react';
@@ -38,7 +39,6 @@ export const CDKProvider = ({ children }: { children: React.ReactNode }) => {
       : 'Unknown';
   };
 
-  // ✅ Save History to SQLite
   const saveHistory = async (
     record: {
       history_id: number;
@@ -83,12 +83,14 @@ db.runSync(
         record.created_at,
       ]
     );
+        showHistoryToast('save');
+
     } catch (error) {
       console.log('SQLite Save Error:', error);
     }
   };
 
-  // ✅ eGFR Calculation
+
   const calculateEGFR = async ({
     serumCreatinine,
     age,
@@ -119,7 +121,6 @@ db.runSync(
     const rounded = Number(egfr.toFixed(0));
     const grade = getGrade(rounded);
 
-    // ✅ Save into SQLite
     await saveHistory({
       history_id: Date.now(),
       age,

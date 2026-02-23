@@ -1,4 +1,5 @@
 import { HapticTab } from '@/components/haptic-tab';
+import HistoryToast from '@/components/toast';
 import { Colors } from '@/constants/theme';
 import { BedsideProvider } from '@/contexts/BedsideContext';
 import { CDKProvider } from '@/contexts/CKDContext';
@@ -67,11 +68,12 @@ export default function TabLayout() {
       }}
       />
     </Tabs>
+    <HistoryToast />
     </CDKProvider>
     </BedsideProvider>
     </HistoryProvider>
-  );
-  
+    
+  ); 
 }
 
 const styles = StyleSheet.create ({
@@ -80,16 +82,16 @@ const styles = StyleSheet.create ({
       borderTopWidth: 0,
       height: 60,
       position: 'absolute',
-      bottom: 16,
+      bottom: 25,
       // left: 30,
       // right: 30,
       marginRight: 80,
       marginLeft: 80,
       borderRadius: 30,
-      shadowOpacity: 0.1,
-      shadowRadius: 10,
+      // shadowOpacity: 0.1,
+      // shadowRadius: 10,
       paddingTop: 10,
-      elevation: 5,
+      // elevation: 5,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -100,7 +102,7 @@ const styles = StyleSheet.create ({
       justifyContent: 'center',
       alignItems: 'center',
       // marginBottom: 4,
-      elevation: 8,
+      // elevation: 8,
       // backgroundColor: 'red'
   },
 })

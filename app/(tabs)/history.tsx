@@ -2,16 +2,17 @@ import HeaderComponent from '@/components/header';
 import Search from '@/components/search';
 import { useHistory } from '@/contexts/historyContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 
 const History = () => {
 
-  const { history, loadHistory,deleteHistory } = useHistory();
+  const { history, loadHistory,deleteHistory, deleteAllHistory, exportHistory, exportSingleHistory } = useHistory();
 
   useFocusEffect(
     useCallback(() => {
@@ -62,10 +63,88 @@ const History = () => {
     );
   };
 
-  const handleSave = (id: number) => {
-    console.log('Save', id);
-    // optional: update saved status in DB
+    const handleDeleteAll = () => {
+    Alert.alert(
+      'Delete Record',
+      'Are you sure you want to delete all history records?',
+      [
+        {
+         text: 'Cancel',
+         style: 'cancel',
+        },
+        {
+          text: 'Delete All',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteAllHistory();
+          },
+        },
+      ]
+    );
   };
+
+  const handleSave = async (id: number) => {
+  try {
+    const historyItem = history.find(item => item.history_id === id);
+    if (!historyItem) {
+      Alert.alert('Error', 'History item not found');
+      return;
+    }
+
+    const content = `
+      History Record
+      --------------
+      Date: ${formatDate(historyItem.created_at)}
+      Age: ${historyItem.age}
+      Sex: ${historyItem.sex}
+      Serum Creatinine: ${historyItem.serum_creatinine} ${historyItem.creatinine_unit}
+      Height: ${historyItem.height ?? '-'} ${historyItem.height_unit ?? ''}
+      eGFR Result: ${historyItem.egfr_result}
+      Grade: ${historyItem.egfr_result_grade ?? '-'}
+      `;
+
+    await Share.share({
+      title: `History-${id}`,
+      message: content,
+    });
+
+  } catch (error) {
+    console.error('Save Error:', error);
+    Alert.alert('Error', 'Failed to save history item.');
+  }
+};
+
+const handleExport = async () => {
+  try {
+    if (!history || history.length === 0) {
+      Alert.alert('No Data', 'No history to export.');
+      return;
+    }
+
+    let content = 'All History Records\n-------------------\n';
+    history.forEach(item => {
+      content += `
+        Date: ${formatDate(item.created_at)}
+        Age: ${item.age}
+        Sex: ${item.sex}
+        Serum Creatinine: ${item.serum_creatinine} ${item.creatinine_unit}
+        Height: ${item.height ?? '-'} ${item.height_unit ?? ''}
+        eGFR Result: ${item.egfr_result}
+        Grade: ${item.egfr_result_grade ?? '-'}
+        -------------------
+        `;
+    });
+
+    await Share.share({
+      title: 'All History Export',
+      message: content,
+    });
+
+  } catch (error) {
+    console.error('Export Error:', error);
+    Alert.alert('Error', 'Failed to export history.');
+  }
+};
 
   return (
     <View style={{ backgroundColor: '#E6F0FA', flex: 1 }}>
@@ -87,9 +166,13 @@ const History = () => {
         <Search />
 
         <View style={styles.resultCountContainer}>
-            <Text style={styles.resultCountText}>
-            {history.length} Result{history.length !== 1 ? 's' : ''} Found
+          <Text style={styles.resultCountText}>
+            <Text style={styles.resultCount}>{history.length}</Text> Result{history.length !== 1 ? 's' : ''} Found
           </Text>
+          <View style={{flexDirection: 'row'}}>
+              <Entypo name="export" size={20} color="#1691E9" onPress={handleExport}/>
+              <MaterialIcons name="delete-outline" size={20} color="#1691E9" onPress={handleDeleteAll}/>
+          </View>
         </View>
 
         <ScrollView style={styles.resultContainer}
@@ -99,7 +182,7 @@ const History = () => {
 
           {history.length === 0 ? (
             <Text style={{ textAlign: 'center', padding: 20 }}>
-              No history available
+              {/* No history available */}
             </Text>
           ) : (
             history.map((item) => (
@@ -114,15 +197,11 @@ const History = () => {
                     />{' '}
                     {formatDate(item.created_at)}
                   </Text>
-                  {/* <Feather name="save" size={20} color="#848488" />
-                  <MaterialIcons name="delete-outline" size={20} color="#848488" /> */}
-
-                  <View style={{ flexDirection: 'row', gap: 10 }}>
-                    <Feather name="save" size={20} color="#848488" onPress={() => handleSave(item.history_id)}/>
-                    <MaterialIcons name="delete-outline" size={20} color="#E74C3C" onPress={() => handleDelete(item.history_id)}/>
+                  <View style={{ flexDirection: 'row', gap: 2}}>
+                    <Feather name="save" size={18} color="#848488" onPress={() => handleSave(item.history_id)}/>
+                    <MaterialIcons name="delete-outline" size={20} color="#848488" onPress={() => handleDelete(item.history_id)}/>
                   </View>
-                </View>
-      
+                </View>     
                 <View style={styles.secondPart}>
 
                   <View style={styles.inputDataBox}>
@@ -130,6 +209,19 @@ const History = () => {
                       S cr: {item.serum_creatinine}{' '}
                       {item.creatinine_unit}
                     </Text>
+
+                    {item.age != null && (
+                      <Text style={styles.inputData}>
+                        Age: {item.age}{' '}
+                        Years
+                      </Text>
+                    )}
+
+                    {item.sex != null && (
+                      <Text style={styles.inputData}>
+                        Gender: {item.sex}{' '}
+                      </Text>
+                    )}
 
                     {item.height != null && (
                       <Text style={styles.inputData}>
@@ -193,7 +285,9 @@ const styles = StyleSheet.create({
   resultContainer: {
     borderRadius: 10,
     padding: 8,
-    width: '98%',
+    width: '94%',
+    margin: 'auto',
+    marginBottom: 20
   },
   firstPart: {
     flexDirection: 'row',
@@ -255,11 +349,22 @@ const styles = StyleSheet.create({
 resultCountContainer: {
   paddingHorizontal: 10,
   paddingBottom: 5,
+  justifyContent: 'space-between',
+  flexDirection: 'row',
+  width: '95%',
+  margin: 'auto'
+  // padding: 20
 },
 
 resultCountText: {
   fontSize: 13,
+  // color: '#1691E9',
+  fontWeight: '500'
+},
+resultCount: {
+  fontSize: 16,
   color: '#1691E9',
-  fontWeight: '500',
+  fontWeight: '700',
+  // backgroundColor: '#1691E9',
 },
 })

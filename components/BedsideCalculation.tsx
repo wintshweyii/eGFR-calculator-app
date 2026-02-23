@@ -84,6 +84,8 @@ const BedsideCalculation = () => {
             value={height}
             onChangeText={handleHeightChange}
             keyboardType="numeric"
+            returnKeyType="done"
+            onSubmitEditing={() => Keyboard.dismiss()}
             placeholder="0"
           />
           <Pressable

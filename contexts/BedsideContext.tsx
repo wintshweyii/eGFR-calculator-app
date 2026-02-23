@@ -1,3 +1,4 @@
+import { showHistoryToast } from '@/components/toast';
 import grades from '@/data/cdkGrades.json';
 import { db } from '@/services/database';
 import React, { createContext, useContext } from 'react';
@@ -45,7 +46,6 @@ export const BedsideProvider = ({
       : 'Unknown';
   };
 
-  // ✅ Save into SAME egfr_history table
   const saveHistory = async (record: any) => {
     try {
       db.runSync(
@@ -78,12 +78,12 @@ export const BedsideProvider = ({
           record.created_at,
         ]
       );
+        showHistoryToast('save');
     } catch (error) {
       console.log('SQLite Bedside Save Error:', error);
     }
   };
 
-  // ✅ Bedside Schwartz Formula
   const calculateBedsideEGFR = async ({
     height,
     heightUnit,
