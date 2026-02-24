@@ -1,8 +1,7 @@
 import { showHistoryToast } from '@/components/toast';
 import { db } from '@/services/database';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
 import React, { createContext, useContext, useState, } from 'react';
+import { Alert, Share } from 'react-native';
 
 export type CKDHistory = {
   history_id: number;
@@ -30,9 +29,17 @@ type HistoryContextType = {
   filterHistory: (filter: HistoryFilter) => Promise<void>;
   deleteHistory: (id: number) => Promise<void>;
   deleteAllHistory: () => Promise<void>;
-  exportHistory: () => Promise<void>;           
+  exportAllHistory: () => Promise<void>;           
   exportSingleHistory: (id: number) => Promise<void>;
 };
+
+  const formatDate = (dateString: string) => {
+    const d = new Date(dateString);
+    return `${d.toLocaleDateString()} | ${d.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}`;
+  };
 
 const HistoryContext =
   createContext<HistoryContextType | undefined>(
@@ -72,17 +79,19 @@ export const HistoryProvider = ({
       const params: any[] = [];
 
       if (filter.fromDate) {
+        const fromISO = new Date(
+          filter.fromDate.setHours(0, 0, 0, 0)
+        ).toISOString();
         query += ` AND created_at >= ?`;
-        params.push(
-          filter.fromDate.toISOString()
-        );
+        params.push(fromISO);
       }
 
       if (filter.toDate) {
+        const toISO = new Date(
+          filter.toDate.setHours(23, 59, 59, 999)
+        ).toISOString();
         query += ` AND created_at <= ?`;
-        params.push(
-          filter.toDate.toISOString()
-        );
+        params.push(toISO);
       }
 
       if (
@@ -144,73 +153,155 @@ export const HistoryProvider = ({
     }
   };
 
-  const generateCSV = (data: CKDHistory[]) => {
-  const header =
-    'Date,Method,Scr,Unit,Age,Sex,Height,Height Unit,eGFR,Grade\n';
-
-  const rows = data
-    .map(item =>
-      `${item.created_at},` +
-      `${item.calculation_method},` +
-      `${item.serum_creatinine},` +
-      `${item.creatinine_unit},` +
-      `${item.age ?? ''},` +
-      `${item.sex ?? ''},` +
-      `${item.height ?? ''},` +
-      `${item.height_unit ?? ''},` +
-      `${item.egfr_result},` +
-      `${item.egfr_result_grade}`
-    )
-    .join('\n');
-
-  return header + rows;
-};
-
-const exportHistory = async () => {
+  const exportSingleHistory  = async (id: number) => {
   try {
-    if (history.length === 0) return;
+    const historyItem = history.find(item => item.history_id === id);
+    if (!historyItem) {
+      Alert.alert('Error', 'History item not found');
+      return;
+    }
 
-    const csv = generateCSV(history);
+    const content = `
+      History Record
+      --------------
+      Date: ${formatDate(historyItem.created_at)}
+      Age: ${historyItem.age}
+      Sex: ${historyItem.sex}
+      Serum Creatinine: ${historyItem.serum_creatinine} ${historyItem.creatinine_unit}
+      Height: ${historyItem.height ?? '-'} ${historyItem.height_unit ?? ''}
+      eGFR Result: ${historyItem.egfr_result}
+      Grade: ${historyItem.egfr_result_grade ?? '-'}
+      `;
 
-    const file = new FileSystem.File(
-      FileSystem.Paths.document,
-      `egfr_history_${Date.now()}.csv`
-    );
+    await Share.share({
+      title: `History-${id}`,
+      message: content,
+    });
 
-    await file.write(csv);
-
-    await Sharing.shareAsync(file.uri);
-    showHistoryToast('exportAll');
   } catch (error) {
-    console.log('Bulk Export Error:', error);
+    console.error('Save Error:', error);
+    Alert.alert('Error', 'Failed to save history item.');
   }
 };
 
-const exportSingleHistory = async (id: number) => {
+const exportAllHistory = async () => {
   try {
-    const result =
-      db.getAllSync<CKDHistory>(
-        `SELECT * FROM egfr_history WHERE history_id = ?`,
-        [id]
-      );
+    if (!history || history.length === 0) {
+      Alert.alert('No Data', 'No history to export.');
+      return;
+    }
+    let content = 'All History Records\n-------------------\n';
+    history.forEach(item => {
+      content += `
+        Date: ${formatDate(item.created_at)}
+        Age: ${item.age}
+        Sex: ${item.sex}
+        Serum Creatinine: ${item.serum_creatinine} ${item.creatinine_unit}
+        Height: ${item.height ?? '-'} ${item.height_unit ?? ''}
+        eGFR Result: ${item.egfr_result}
+        Grade: ${item.egfr_result_grade ?? '-'}
+        -------------------
+        `;
+    });
 
-    if (result.length === 0) return;
+    await Share.share({
+      title: 'All History Export',
+      message: content,
+    });
 
-    const csv = generateCSV(result);
-
-    const file = new FileSystem.File(
-      FileSystem.Paths.document,
-      `egfr_record_${id}.csv`
-    );
-
-    await file.write(csv);
-
-    await Sharing.shareAsync(file.uri);
-    showHistoryToast('export');
   } catch (error) {
-    console.log('Single Export Error:', error);
+    console.error('Export Error:', error);
+    Alert.alert('Error', 'Failed to export history.');
   }
 };
+
+
+
+// Export single history as PDF
+// const exportSingleHistoryPDF = async (id: number) => {
+//   try {
+//     const historyItem = history.find(item => item.history_id === id);
+//     if (!historyItem) {
+//       Alert.alert('Error', 'History item not found');
+//       return;
+//     }
+
+//     const htmlContent = `
+//       <h2 style="color:#2f6d43;">History Record</h2>
+//       <hr/>
+//       <p><strong>Date:</strong> ${formatDate(historyItem.created_at)}</p>
+//       <p><strong>Age:</strong> ${historyItem.age}</p>
+//       <p><strong>Sex:</strong> ${historyItem.sex}</p>
+//       <p><strong>Serum Creatinine:</strong> ${historyItem.serum_creatinine} ${historyItem.creatinine_unit}</p>
+//       <p><strong>Height:</strong> ${historyItem.height ?? '-'} ${historyItem.height_unit ?? ''}</p>
+//       <p><strong>eGFR Result:</strong> ${historyItem.egfr_result}</p>
+//       <p><strong>Grade:</strong> ${historyItem.egfr_result_grade ?? '-'}</p>
+//     `;
+
+//     const options = {
+//       html: htmlContent,
+//       fileName: `History-${id}`,
+//       directory: 'Documents',
+//     };
+
+//     const file = await RNHTMLtoPDF.convert(options);
+
+//     await Share.share({
+//       title: `History-${id}`,
+//       url: Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath,
+//     });
+
+//     Alert.alert('Success', 'PDF exported successfully!');
+//   } catch (error) {
+//     console.error(error);
+//     Alert.alert('Error', 'Failed to export history as PDF.');
+//   }
+// };
+
+// // Export all history as PDF
+// const exportAllHistoryPDF = async () => {
+//   try {
+//     if (!history || history.length === 0) {
+//       Alert.alert('No Data', 'No history to export.');
+//       return;
+//     }
+
+//     let htmlContent = `<h2 style="color:#2f6d43;">All History Records</h2><hr/>`;
+
+//     history.forEach(item => {
+//       htmlContent += `
+//         <p>
+//           <strong>Date:</strong> ${formatDate(item.created_at)}<br/>
+//           <strong>Age:</strong> ${item.age}<br/>
+//           <strong>Sex:</strong> ${item.sex}<br/>
+//           <strong>Serum Creatinine:</strong> ${item.serum_creatinine} ${item.creatinine_unit}<br/>
+//           <strong>Height:</strong> ${item.height ?? '-'} ${item.height_unit ?? ''}<br/>
+//           <strong>eGFR Result:</strong> ${item.egfr_result}<br/>
+//           <strong>Grade:</strong> ${item.egfr_result_grade ?? '-'}
+//         </p>
+//         <hr/>
+//       `;
+//     });
+
+//     const options = {
+//       html: htmlContent,
+//       fileName: 'All_History',
+//       directory: 'Documents',
+//     };
+
+//     const file = await RNHTMLtoPDF.convert(options);
+
+//     await Share.share({
+//       title: 'All History Export',
+//       url: Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath,
+//     });
+
+//     Alert.alert('Success', 'PDF exported successfully!');
+//   } catch (error) {
+//     console.error(error);
+//     Alert.alert('Error', 'Failed to export all history as PDF.');
+//   }
+// };
 
   return (
     <HistoryContext.Provider
@@ -220,8 +311,8 @@ const exportSingleHistory = async (id: number) => {
         filterHistory,
         deleteHistory,
         deleteAllHistory,
-        exportHistory,
-        exportSingleHistory
+        exportSingleHistory,
+        exportAllHistory
       }}
     >
       {children}

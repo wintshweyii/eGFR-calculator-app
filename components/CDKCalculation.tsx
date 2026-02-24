@@ -1,5 +1,5 @@
 import { useCDK } from '@/contexts/CKDContext';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 const CDKCalculation = () => {
@@ -11,9 +11,34 @@ const CDKCalculation = () => {
   const [gender, setGender] = useState<'Male' | 'Female'>('Male');
   const [result, setResult] = useState(0);
   const [grade, setGrade] = useState('');
+  const [scrError, setScrError] = useState(false);
+  const [ageError, setAgeError] = useState(false);
+  
+  const scrInputRef = useRef<TextInput>(null);
+  const AgeInputRef = useRef<TextInput>(null);
 
   const handleCalculate = async () => {
-    if (!scr || !age) return;
+    let hasError = false;
+
+    if (!scr) {
+      setScrError(true);
+      scrInputRef.current?.focus();
+      hasError = true;
+    } else {
+      setScrError(false);
+    }
+
+    if (!age) {
+      setAgeError(true);
+      if (!hasError) {
+        AgeInputRef.current?.focus();
+      }
+      hasError = true;
+    } else {
+      setAgeError(false);
+    }
+
+    if (hasError) return;
 
     const { egfr, grade } = await calculateEGFR({
       serumCreatinine: Number(scr),
@@ -41,11 +66,13 @@ const CDKCalculation = () => {
         <Text style={styles.label}>S cr</Text>
         <View style={styles.inputRow}>
           <TextInput
-            style={styles.input}
+            ref={scrInputRef}
+            style={[styles.input, scrError && styles.errorInput]}
             value={scr}
-            onChangeText={(text) => {
-              setScr(text);
+            onChangeText={(val) => {
+              setScr(val);
               clearResult();
+              if (val) setScrError(false);
             }}
             keyboardType="numeric"
             returnKeyType="done"
@@ -68,11 +95,13 @@ const CDKCalculation = () => {
         <Text style={styles.label}>Age</Text>
         <View style={styles.inputRow}>
           <TextInput
-            style={styles.input}
+            ref={AgeInputRef}
+            style={[styles.input, ageError && styles.errorInput]}
             value={age}
-            onChangeText={(text) => {
-              setAge(text);
+            onChangeText={(val) => {
+              setAge(val);
               clearResult();
+              if (val) setAgeError(false);
             }}
             keyboardType="numeric"
             returnKeyType="done"
@@ -203,13 +232,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around'
   },
+  errorInput: {
+    borderColor: 'red',
+  },
   unitBtn: {
     marginLeft: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
     backgroundColor: '#1691E9',
     borderRadius: 8,
-    width: 90
+    width: 90,
+    alignItems: 'center'
   },
   unitText: {
     color: 'white',

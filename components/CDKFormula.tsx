@@ -18,6 +18,14 @@ const CDKFormula = () => {
       <ScrollView>
           <Text style={styles.formulaStyle}>{method.formula}</Text>
       </ScrollView>
+      <Text style={styles.abbravation}>
+        <Text>Scr = standardized serum creatinine in mg/dL{'\n'}</Text>
+        <Text>κ = 0.7 (females) or 0.9 (males){'\n'}</Text>
+        <Text>α = -0.241 (female) or -0.302 (male){'\n'}</Text>
+        <Text>min(Scr/κ, 1) is the minimum of Scr/κ or 1.0{'\n'}</Text>
+        <Text>max(Scr/κ, 1) is the maximum of Scr/κ or 1.0{'\n'}</Text>
+        <Text>Age (years)</Text>
+      </Text>
       <View style={{gap: 10, marginTop: 10}}>
       <Text style={{fontWeight: 300, fontStyle: 'italic'}}>Sources: </Text>
       <Pressable onPress={openLink1}>
@@ -42,7 +50,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 20,
     marginTop: 12,
-    height: '78%'
+    height: '79%'
   },
   heading: {
     fontSize: 20,
@@ -58,9 +66,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10
   },
-    linkStyle: {
+  linkStyle: {
     fontWeight: 200,
     fontStyle: 'italic',
     textDecorationLine: 'underline'
+  },
+  abbravation: {
+    lineHeight: 18,
+    color: '#333',
   }
 })

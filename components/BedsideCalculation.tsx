@@ -1,31 +1,50 @@
 import { useBedside } from '@/contexts/BedsideContext';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 const BedsideCalculation = () => {
   const { calculateBedsideEGFR } = useBedside();
 
   const [scr, setScr] = useState('');
-  const [creatinineUnit, setCreatinineUnit] = useState<'mg/dL' | 'µmol/L'>('mg/dL');
   const [height, setHeight] = useState('');
+  const [creatinineUnit, setCreatinineUnit] = useState<'mg/dL' | 'µmol/L'>('mg/dL');
   const [heightUnit, setHeightUnit] = useState<'cm' | 'inch'>('cm');
   const [result, setResult] = useState(0);
   const [grade, setGrade] = useState('');
 
-  const handleScrChange = (val: string) => {
-    setScr(val);
+  const [scrError, setScrError] = useState(false);
+  const [heightError, setHeightError] = useState(false);
+
+  const scrInputRef = useRef<TextInput>(null);
+  const heightInputRef = useRef<TextInput>(null);
+
+  const clearResult = () => {
     setResult(0);
     setGrade('');
   };
 
-  const handleHeightChange = (val: string) => {
-    setHeight(val);
-    setResult(0);
-    setGrade('');
-  };
+  const handleCalculate = async () => {
+    let hasError = false;
 
-  const handleCalculate = async() => {
-    if (!scr || !height) return;
+    if (!scr) {
+      setScrError(true);
+      scrInputRef.current?.focus();
+      hasError = true;
+    } else {
+      setScrError(false);
+    }
+
+    if (!height) {
+      setHeightError(true);
+      if (!hasError) {
+        heightInputRef.current?.focus();
+      }
+      hasError = true;
+    } else {
+      setHeightError(false);
+    }
+
+    if (hasError) return;
 
     const { egfr, grade } = await calculateBedsideEGFR({
       height: Number(height),
@@ -38,19 +57,6 @@ const BedsideCalculation = () => {
     setGrade(grade);
   };
 
-  const handleClear = () => {
-    setScr('');
-    setHeight('');
-    setResult(0);
-    setGrade('');
-    setCreatinineUnit('mg/dL');
-    setHeightUnit('cm');
-  };
-    const clearResult = () => {
-    setResult(0);
-    setGrade('');
-  };
-
   return (
     <View style={styles.container}>
 
@@ -58,9 +64,14 @@ const BedsideCalculation = () => {
         <Text style={styles.label}>S cr</Text>
         <View style={styles.inputRow}>
           <TextInput
-            style={styles.input}
+            ref={scrInputRef}
+            style={[styles.input, scrError && styles.errorInput]}
             value={scr}
-            onChangeText={handleScrChange}
+            onChangeText={(val) => {
+              setScr(val);
+              clearResult();
+              if (val) setScrError(false);
+            }}
             keyboardType="numeric"
             returnKeyType="done"
             onSubmitEditing={() => Keyboard.dismiss()}
@@ -68,21 +79,28 @@ const BedsideCalculation = () => {
           />
           <Pressable
             style={styles.unitBtn}
-            onPress={() => {setCreatinineUnit(creatinineUnit === 'mg/dL' ? 'µmol/L' : 'mg/dL'); clearResult()}}
+            onPress={() => {
+              setCreatinineUnit(creatinineUnit === 'mg/dL' ? 'µmol/L' : 'mg/dL');
+              clearResult();
+            }}
           >
             <Text style={styles.unitText}>{creatinineUnit} ▼</Text>
           </Pressable>
         </View>
       </View>
 
-
       <View style={styles.inputBox}>
         <Text style={styles.label}>Height</Text>
         <View style={styles.inputRow}>
           <TextInput
-            style={styles.input}
+            ref={heightInputRef}
+            style={[styles.input, heightError && styles.errorInput]}
             value={height}
-            onChangeText={handleHeightChange}
+            onChangeText={(val) => {
+              setHeight(val);
+              clearResult();
+              if (val) setHeightError(false);
+            }}
             keyboardType="numeric"
             returnKeyType="done"
             onSubmitEditing={() => Keyboard.dismiss()}
@@ -90,29 +108,36 @@ const BedsideCalculation = () => {
           />
           <Pressable
             style={styles.unitBtn}
-            onPress={() => {setHeightUnit(heightUnit === 'cm' ? 'inch' : 'cm'); clearResult()}}
+            onPress={() => {
+              setHeightUnit(heightUnit === 'cm' ? 'inch' : 'cm');
+              clearResult();
+            }}
           >
             <Text style={styles.unitText}>{heightUnit} ▼</Text>
           </Pressable>
+
         </View>
       </View>
 
-
       <View style={styles.resultBox}>
         <Text style={styles.resultLabel}>eGFR Result:</Text>
-        <Text style={styles.resultValue}>
-          {result} ml/min/1.73 m²
-        </Text>
+        <Text style={styles.resultValue}>{result} ml/min/1.73 m²</Text>
         {grade ? (
-          <Text style={{ marginTop: 6, fontWeight: '500', color: '#1691E9' }}>
-            {grade}
-          </Text>
+          <Text style={{ marginTop: 6, fontWeight: '500', color: '#1691E9' }}>{grade}</Text>
         ) : null}
       </View>
 
-
       <View style={styles.btnRow}>
-        <Pressable style={styles.btn} onPress={handleClear}>
+        <Pressable style={styles.btn} onPress={() => {
+          setScr('');
+          setHeight('');
+          setResult(0);
+          setGrade('');
+          setCreatinineUnit('mg/dL');
+          setHeightUnit('cm');
+          setScrError(false);
+          setHeightError(false);
+        }}>
           <Text style={styles.btnText}>Clear</Text>
         </Pressable>
 
@@ -120,7 +145,6 @@ const BedsideCalculation = () => {
           <Text style={styles.btnText}>Calculate</Text>
         </Pressable>
       </View>
-
     </View>
   );
 };
@@ -167,7 +191,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around'
   },
-
+  errorInput: {
+    borderColor: 'red',
+  },
   unitBtn: {
     marginLeft: 10,
     paddingVertical: 10,
@@ -175,6 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1691E9',
     borderRadius: 8,
     width: 90,
+    alignItems: 'center'
     // height: 40
   },
 

@@ -1,3 +1,4 @@
+import ConfirmModal from '@/components/delete-confirm-modal';
 import HeaderComponent from '@/components/header';
 import Search from '@/components/search';
 import { useHistory } from '@/contexts/historyContext';
@@ -7,12 +8,16 @@ import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useCallback } from 'react';
-import { Alert, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const History = () => {
 
-  const { history, loadHistory,deleteHistory, deleteAllHistory, exportHistory, exportSingleHistory } = useHistory();
+  const { history, loadHistory,deleteHistory, deleteAllHistory, exportAllHistory, exportSingleHistory } = useHistory();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [deleteType, setDeleteType] = useState<'single' | 'all' | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -25,6 +30,7 @@ const History = () => {
     return `${d.toLocaleDateString()} | ${d.toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
+      hour12: true,
     })}`;
   };
 
@@ -44,106 +50,32 @@ const History = () => {
 };
 
   const handleDelete = (id: number) => {
-    Alert.alert(
-      'Delete Record',
-      'Are you sure you want to delete this history item?',
-      [
-        {
-         text: 'Cancel',
-         style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteHistory(id);
-          },
-        },
-      ]
-    );
+    setSelectedId(id);
+    setDeleteType('single');
+    setModalVisible(true);
   };
 
-    const handleDeleteAll = () => {
-    Alert.alert(
-      'Delete Record',
-      'Are you sure you want to delete all history records?',
-      [
-        {
-         text: 'Cancel',
-         style: 'cancel',
-        },
-        {
-          text: 'Delete All',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteAllHistory();
-          },
-        },
-      ]
-    );
-  };
-
-  const handleSave = async (id: number) => {
-  try {
-    const historyItem = history.find(item => item.history_id === id);
-    if (!historyItem) {
-      Alert.alert('Error', 'History item not found');
-      return;
-    }
-
-    const content = `
-      History Record
-      --------------
-      Date: ${formatDate(historyItem.created_at)}
-      Age: ${historyItem.age}
-      Sex: ${historyItem.sex}
-      Serum Creatinine: ${historyItem.serum_creatinine} ${historyItem.creatinine_unit}
-      Height: ${historyItem.height ?? '-'} ${historyItem.height_unit ?? ''}
-      eGFR Result: ${historyItem.egfr_result}
-      Grade: ${historyItem.egfr_result_grade ?? '-'}
-      `;
-
-    await Share.share({
-      title: `History-${id}`,
-      message: content,
-    });
-
-  } catch (error) {
-    console.error('Save Error:', error);
-    Alert.alert('Error', 'Failed to save history item.');
-  }
-};
-
-const handleExport = async () => {
-  try {
+  const handleDeleteAll = () => {
     if (!history || history.length === 0) {
-      Alert.alert('No Data', 'No history to export.');
+      Alert.alert('No Data', 'No history to delete.');
       return;
     }
+    setDeleteType('all');
+    setModalVisible(true);
+  };
 
-    let content = 'All History Records\n-------------------\n';
-    history.forEach(item => {
-      content += `
-        Date: ${formatDate(item.created_at)}
-        Age: ${item.age}
-        Sex: ${item.sex}
-        Serum Creatinine: ${item.serum_creatinine} ${item.creatinine_unit}
-        Height: ${item.height ?? '-'} ${item.height_unit ?? ''}
-        eGFR Result: ${item.egfr_result}
-        Grade: ${item.egfr_result_grade ?? '-'}
-        -------------------
-        `;
-    });
-
-    await Share.share({
-      title: 'All History Export',
-      message: content,
-    });
-
-  } catch (error) {
-    console.error('Export Error:', error);
-    Alert.alert('Error', 'Failed to export history.');
+  const handleConfirmDelete = async () => {
+  if (deleteType === 'single' && selectedId !== null) {
+    await deleteHistory(selectedId);
   }
+
+  if (deleteType === 'all') {
+    await deleteAllHistory();
+  }
+
+  setModalVisible(false);
+  setDeleteType(null);
+  setSelectedId(null);
 };
 
   return (
@@ -170,14 +102,15 @@ const handleExport = async () => {
             <Text style={styles.resultCount}>{history.length}</Text> Result{history.length !== 1 ? 's' : ''} Found
           </Text>
           <View style={{flexDirection: 'row'}}>
-              <Entypo name="export" size={20} color="#1691E9" onPress={handleExport}/>
+              <Entypo name="export" size={20} color="#1691E9" onPress={exportAllHistory}/>
               <MaterialIcons name="delete-outline" size={20} color="#1691E9" onPress={handleDeleteAll}/>
           </View>
         </View>
 
-        <ScrollView style={styles.resultContainer}
-        contentContainerStyle={{ paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
+        <ScrollView 
+          style={styles.resultContainer}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
         >
 
           {history.length === 0 ? (
@@ -198,7 +131,7 @@ const handleExport = async () => {
                     {formatDate(item.created_at)}
                   </Text>
                   <View style={{ flexDirection: 'row', gap: 2}}>
-                    <Feather name="save" size={18} color="#848488" onPress={() => handleSave(item.history_id)}/>
+                    <Feather name="save" size={18} color="#848488" onPress={() => exportSingleHistory(item.history_id)}/>
                     <MaterialIcons name="delete-outline" size={20} color="#848488" onPress={() => handleDelete(item.history_id)}/>
                   </View>
                 </View>     
@@ -264,8 +197,24 @@ const handleExport = async () => {
         </ScrollView>
 
       </View>
+      <ConfirmModal
+          visible={modalVisible}
+          confirmText={
+            deleteType === 'all'
+              ? 'Are you sure you want to delete ALL history records?'
+              : 'Are you sure you want to delete this history record?'
+          }
+          onConfirm={handleConfirmDelete}
+          onCancel={() => {
+            setModalVisible(false);
+            setDeleteType(null);
+            setSelectedId(null);
+          }}
+        />
     </View>
+
   );
+  
 };
 
 export default History;
@@ -275,7 +224,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: '5%',
     marginTop: '35%',
-    marginBottom: '20%' //*
+    marginBottom: '20%'
   },
   header: {
     padding: 20,
@@ -325,7 +274,7 @@ const styles = StyleSheet.create({
     // backgroundColor: '#0f16dc',
     color: 'white',
     borderRadius: 10,
-    fontSize: 12,
+    fontSize: 10,
     padding: 4,
   },
   thirdPart: {
@@ -352,8 +301,9 @@ resultCountContainer: {
   justifyContent: 'space-between',
   flexDirection: 'row',
   width: '95%',
-  margin: 'auto'
-  // padding: 20
+  margin: 'auto',
+  marginTop: 7,
+  marginBottom: 7,
 },
 
 resultCountText: {

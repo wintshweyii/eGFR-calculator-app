@@ -2,34 +2,72 @@ import methodsandformulas from '@/data/methodsandformulas.json';
 import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-
 const CDKUsage = () => {
   const method = methodsandformulas.find((m) => m.id === 'ckd');
   if (!method) return <Text>Method not found!</Text>;
+
   return (
     <View style={styles.container}>
-      <Text>CDKUsage</Text>
+      <Text style={styles.title}>CKD Calculation Usage</Text>
+
       <FlatList
         data={method.usage}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Text>• {item}</Text>}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item }) => (
+          <View style={styles.itemContainer}>
+            <Text style={styles.bullet}>•</Text>
+            <Text style={styles.itemText}>{item}</Text>
+          </View>
+        )}
       />
     </View>
-  )
-}
+  );
+};
 
-export default CDKUsage
+export default CDKUsage;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     width: '98%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-    // padding: 15,
-    height: '78%',
+    alignSelf: 'center',
+    borderRadius: 10,
+    padding: 20,
     marginTop: 12,
-    padding: 15
-  }
-})
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    height: '79%'
+  },
+
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1691E9',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+
+  bullet: {
+    fontSize: 16,
+    color: '#1691E9',
+    marginRight: 8,
+    lineHeight: 22,
+  },
+
+  itemText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 22,
+  },
+});

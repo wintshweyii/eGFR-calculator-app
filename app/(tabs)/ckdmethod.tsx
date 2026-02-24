@@ -33,10 +33,7 @@ const CKDMethod = () => {
             fontWeight: '600',
           },
         }}
-      />
-
-
-        
+      />     
         <View style={styles.tabContainer}>
           <TabButton
             label="Calculator"

@@ -28,7 +28,6 @@ const CDKContext = createContext<CDKContextType | undefined>(undefined);
 
 export const CDKProvider = ({ children }: { children: React.ReactNode }) => {
 
-  // ✅ Get CKD Grade
   const getGrade = (value: number): string => {
     const found = (grades as CKDGrade[]).find(
       g => value >= g.min && value <= g.max

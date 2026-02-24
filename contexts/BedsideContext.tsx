@@ -29,13 +29,12 @@ type BedsideContextType = {
 const BedsideContext =
   createContext<BedsideContextType | undefined>(undefined);
 
-export const BedsideProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+  export const BedsideProvider = ({
+    children,
+  }: {
+    children: React.ReactNode;
+  }) => {
 
-  // ✅ Grade Finder
   const getGrade = (value: number): string => {
     const found = (grades as CKDGrade[]).find(
       g => value >= g.min && value <= g.max
