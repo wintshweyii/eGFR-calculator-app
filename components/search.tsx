@@ -2,10 +2,14 @@ import { useHistory } from '@/contexts/historyContext';
 import Octicons from '@expo/vector-icons/Octicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CustomDropdown from './DropDown';
 
-const calculationMethods = ['All', 'CKD-EPI', 'Bedside'];
+const calculationMethods = [
+  { label: 'All', value: 'All' },
+  { label: 'CKD-EPI', value: 'CKD-EPI' },
+  { label: 'Bedside', value: 'Bedside Schwartz' },
+];
 
 const Search = () => {
   const { filterHistory, loadHistory } = useHistory();
@@ -30,7 +34,7 @@ const Search = () => {
 
       <View style={{flexDirection: 'row'}}>
       <View style={styles.inlineRow}>
-        <Text style={[styles.labelSmall, {marginRight: 16}]}>From</Text>
+        <Text style={[styles.labelSmall]}>From</Text>
         <TouchableOpacity style={styles.compactInput} onPress={() => setShowStartPicker(true)}>
           <Text style={styles.inputText}>{formatDate(fromDate)}</Text>
         </TouchableOpacity>
@@ -44,13 +48,15 @@ const Search = () => {
       </View>
       </View>
       <View style={styles.methodRow}>
+        <View style={styles.inlineRow}>
         <Text style={styles.labelSmall}>Method</Text>
           <CustomDropdown
-            data={calculationMethods.map((method) => ({ id: method, name: method }))}
+            data={calculationMethods.map((method) => ({ id: method.value, name: method.label }))}
             selectedValue={selectedMethod}
             onSelect={(selectedId) => setSelectedMethod(selectedId as string)}
           />
-        <View style={styles.buttonRow}>
+        </View>
+        <View style={styles.inlineRow}>
           <TouchableOpacity style={[styles.button, styles.searchButton]} onPress={() => filterHistory({ method: selectedMethod, fromDate, toDate })}>
             <Text style={styles.buttonText}><Octicons name="search" size={12} color="white" /> Filter</Text>
           </TouchableOpacity>
@@ -60,55 +66,37 @@ const Search = () => {
         </View>
       </View>
 
-      <Modal transparent visible={showStartPicker} animationType='fade'>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <DateTimePicker
-              value={fromDate || new Date()}
-              mode="date"
-              display="spinner"
-              onChange={(event, selectedDate) => {
-                if (selectedDate) {
-                  setFromDate(selectedDate);
-                }
-              }}
-            />
+      {showStartPicker && (
+        <DateTimePicker
+          value={fromDate || new Date()}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowStartPicker(false);
 
-            <TouchableOpacity
-              style={styles.doneButton}
-              onPress={() => setShowStartPicker(false)}
-            >
-              <Text style={styles.doneText}>Done</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+            if (event.type === 'set' && selectedDate) {
+              setFromDate(selectedDate);
+            }
+          }}
+        />
+      )}
 
-      <Modal transparent visible={showEndPicker} animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <DateTimePicker
-              value={toDate || new Date()}
-              mode="date"
-              minimumDate={fromDate}
-              display="spinner"
-              onChange={(event, selectedDate) => {
-                if (selectedDate) {
-                  setToDate(selectedDate);
-                }
-              }}
-            />
+      {/* End Date Picker */}
+      {showEndPicker && (
+        <DateTimePicker
+          value={toDate || new Date()}
+          mode="date"
+          minimumDate={fromDate}
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowEndPicker(false);
 
-            <TouchableOpacity
-              style={styles.doneButton}
-              onPress={() => setShowEndPicker(false)}
-            >
-              <Text style={styles.doneText}>Done</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
+            if (event.type === 'set' && selectedDate) {
+              setToDate(selectedDate);
+            }
+          }}
+        />
+      )}
     </View>
   );
 };
@@ -124,7 +112,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
-    width: '48%',
+    flex: 1,
     justifyContent: 'space-between',
     paddingVertical: 8,
     margin: 'auto'
@@ -139,7 +127,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
     color: '#111',
-    // marginRight: 5
   },
   compactInput: {
     backgroundColor: '#fff',
@@ -160,27 +147,24 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 12,
   },
-  periodText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 12,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    // marginTop: 10,
-    width: '45%',
-    marginLeft: 17
-  },
+  // buttonRow: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-evenly',
+  //   // marginTop: 10,
+  //   width: '45%',
+  //   marginLeft: 17
+  // },
   button: {
     flex: 1,
     paddingVertical: 8,
     borderRadius: 8,
     alignItems: 'center',
+    height: 30
   },
   searchButton: { 
     backgroundColor: '#1691E9', 
-    marginRight: 4 
+    marginRight: 4 ,
+    marginLeft: 17
   }, 
   resetButton: { 
     backgroundColor: '#1691E9'
@@ -189,32 +173,5 @@ const styles = StyleSheet.create({
     color: '#fff', 
     fontWeight: '600', 
     fontSize: 12 
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  modalContainer: {
-    backgroundColor: '#4280c1',
-    borderRadius: 20,
-    padding: 20,
-    width: '85%',
-    alignItems: 'center'
-  },
-
-  doneButton: {
-    marginTop: 15,
-    backgroundColor: '#fff',
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    borderRadius: 30
-  },
-
-  doneText: {
-    color: '#1691E9',
-    fontWeight: 'bold',
-  },
+  }
 });

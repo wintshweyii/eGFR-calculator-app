@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 20,
     marginTop: 12,
-    height: 'auto'
   },
   heading: {
     fontSize: 20,
@@ -56,8 +55,9 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   linkStyle: {
-    fontWeight: 200,
+    fontWeight: 300,
     fontStyle: 'italic',
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
+    color: 'blue'
   }
 })

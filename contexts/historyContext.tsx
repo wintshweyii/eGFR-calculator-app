@@ -1,7 +1,9 @@
 import { showHistoryToast } from '@/components/toast';
 import { db } from '@/services/database';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import React, { createContext, useContext, useState, } from 'react';
-import { Alert, Share } from 'react-native';
+import { Alert } from 'react-native';
 
 export type CKDHistory = {
   history_id: number;
@@ -153,34 +155,42 @@ export const HistoryProvider = ({
     }
   };
 
-  const exportSingleHistory  = async (id: number) => {
+const exportSingleHistory = async (id: number) => {
   try {
-    const historyItem = history.find(item => item.history_id === id);
+    const historyItem = history.find(
+      item => item.history_id === id
+    );
+
     if (!historyItem) {
       Alert.alert('Error', 'History item not found');
       return;
     }
 
-    const content = `
-      History Record
-      --------------
-      Date: ${formatDate(historyItem.created_at)}
-      Age: ${historyItem.age}
-      Sex: ${historyItem.sex}
-      Serum Creatinine: ${historyItem.serum_creatinine} ${historyItem.creatinine_unit}
-      Height: ${historyItem.height ?? '-'} ${historyItem.height_unit ?? ''}
-      eGFR Result: ${historyItem.egfr_result}
-      Grade: ${historyItem.egfr_result_grade ?? '-'}
-      `;
+    const htmlContent = `
+      <html>
+        <body>
+          <h1>CKD History Record</h1>
+          <hr/>
+          <p><strong>Date:</strong> ${formatDate(historyItem.created_at)}</p>
+          <p><strong>Age:</strong> ${historyItem.age ?? '-'}</p>
+          <p><strong>Sex:</strong> ${historyItem.sex ?? '-'}</p>
+          <p><strong>Serum Creatinine:</strong> ${historyItem.serum_creatinine} ${historyItem.creatinine_unit}</p>
+          <p><strong>Height:</strong> ${historyItem.height ?? '-'} ${historyItem.height_unit ?? ''}</p>
+          <p><strong>eGFR Result:</strong> ${historyItem.egfr_result}</p>
+          <p><strong>Grade:</strong> ${historyItem.egfr_result_grade ?? '-'}</p>
+        </body>
+      </html>
+    `;
 
-    await Share.share({
-      title: `History-${id}`,
-      message: content,
+    const { uri } = await Print.printToFileAsync({
+      html: htmlContent,
     });
 
+    await Sharing.shareAsync(uri);
+
   } catch (error) {
-    console.error('Save Error:', error);
-    Alert.alert('Error', 'Failed to save history item.');
+    console.error('Export PDF Error:', error);
+    Alert.alert('Error', 'Failed to export history item.');
   }
 };
 
@@ -190,118 +200,42 @@ const exportAllHistory = async () => {
       Alert.alert('No Data', 'No history to export.');
       return;
     }
-    let content = 'All History Records\n-------------------\n';
+
+    let rows = '';
+
     history.forEach(item => {
-      content += `
-        Date: ${formatDate(item.created_at)}
-        Age: ${item.age}
-        Sex: ${item.sex}
-        Serum Creatinine: ${item.serum_creatinine} ${item.creatinine_unit}
-        Height: ${item.height ?? '-'} ${item.height_unit ?? ''}
-        eGFR Result: ${item.egfr_result}
-        Grade: ${item.egfr_result_grade ?? '-'}
-        -------------------
-        `;
+      rows += `
+        <hr/>
+        <p><strong>Date:</strong> ${formatDate(item.created_at)}</p>
+        <p><strong>Age:</strong> ${item.age ?? '-'}</p>
+        <p><strong>Sex:</strong> ${item.sex ?? '-'}</p>
+        <p><strong>Serum Creatinine:</strong> ${item.serum_creatinine} ${item.creatinine_unit}</p>
+        <p><strong>Height:</strong> ${item.height ?? '-'} ${item.height_unit ?? ''}</p>
+        <p><strong>eGFR Result:</strong> ${item.egfr_result}</p>
+        <p><strong>Grade:</strong> ${item.egfr_result_grade ?? '-'}</p>
+      `;
     });
 
-    await Share.share({
-      title: 'All History Export',
-      message: content,
+    const htmlContent = `
+      <html>
+        <body>
+          <h1>All CKD History Records</h1>
+          ${rows}
+        </body>
+      </html>
+    `;
+
+    const { uri } = await Print.printToFileAsync({
+      html: htmlContent,
     });
+
+    await Sharing.shareAsync(uri);
 
   } catch (error) {
-    console.error('Export Error:', error);
+    console.error('Export All PDF Error:', error);
     Alert.alert('Error', 'Failed to export history.');
   }
 };
-
-
-
-// Export single history as PDF
-// const exportSingleHistoryPDF = async (id: number) => {
-//   try {
-//     const historyItem = history.find(item => item.history_id === id);
-//     if (!historyItem) {
-//       Alert.alert('Error', 'History item not found');
-//       return;
-//     }
-
-//     const htmlContent = `
-//       <h2 style="color:#2f6d43;">History Record</h2>
-//       <hr/>
-//       <p><strong>Date:</strong> ${formatDate(historyItem.created_at)}</p>
-//       <p><strong>Age:</strong> ${historyItem.age}</p>
-//       <p><strong>Sex:</strong> ${historyItem.sex}</p>
-//       <p><strong>Serum Creatinine:</strong> ${historyItem.serum_creatinine} ${historyItem.creatinine_unit}</p>
-//       <p><strong>Height:</strong> ${historyItem.height ?? '-'} ${historyItem.height_unit ?? ''}</p>
-//       <p><strong>eGFR Result:</strong> ${historyItem.egfr_result}</p>
-//       <p><strong>Grade:</strong> ${historyItem.egfr_result_grade ?? '-'}</p>
-//     `;
-
-//     const options = {
-//       html: htmlContent,
-//       fileName: `History-${id}`,
-//       directory: 'Documents',
-//     };
-
-//     const file = await RNHTMLtoPDF.convert(options);
-
-//     await Share.share({
-//       title: `History-${id}`,
-//       url: Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath,
-//     });
-
-//     Alert.alert('Success', 'PDF exported successfully!');
-//   } catch (error) {
-//     console.error(error);
-//     Alert.alert('Error', 'Failed to export history as PDF.');
-//   }
-// };
-
-// // Export all history as PDF
-// const exportAllHistoryPDF = async () => {
-//   try {
-//     if (!history || history.length === 0) {
-//       Alert.alert('No Data', 'No history to export.');
-//       return;
-//     }
-
-//     let htmlContent = `<h2 style="color:#2f6d43;">All History Records</h2><hr/>`;
-
-//     history.forEach(item => {
-//       htmlContent += `
-//         <p>
-//           <strong>Date:</strong> ${formatDate(item.created_at)}<br/>
-//           <strong>Age:</strong> ${item.age}<br/>
-//           <strong>Sex:</strong> ${item.sex}<br/>
-//           <strong>Serum Creatinine:</strong> ${item.serum_creatinine} ${item.creatinine_unit}<br/>
-//           <strong>Height:</strong> ${item.height ?? '-'} ${item.height_unit ?? ''}<br/>
-//           <strong>eGFR Result:</strong> ${item.egfr_result}<br/>
-//           <strong>Grade:</strong> ${item.egfr_result_grade ?? '-'}
-//         </p>
-//         <hr/>
-//       `;
-//     });
-
-//     const options = {
-//       html: htmlContent,
-//       fileName: 'All_History',
-//       directory: 'Documents',
-//     };
-
-//     const file = await RNHTMLtoPDF.convert(options);
-
-//     await Share.share({
-//       title: 'All History Export',
-//       url: Platform.OS === 'android' ? `file://${file.filePath}` : file.filePath,
-//     });
-
-//     Alert.alert('Success', 'PDF exported successfully!');
-//   } catch (error) {
-//     console.error(error);
-//     Alert.alert('Error', 'Failed to export all history as PDF.');
-//   }
-// };
 
   return (
     <HistoryContext.Provider

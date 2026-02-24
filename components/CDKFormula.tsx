@@ -1,6 +1,6 @@
 import methodsandformulas from '@/data/methodsandformulas.json';
 import React from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
 const CDKFormula = () => {
   const method = methodsandformulas.find((m) => m.id === 'ckd');
@@ -15,9 +15,9 @@ const CDKFormula = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>CKD-EPI Creatinine Equation (2021) Formula</Text>
-      <ScrollView>
+      <View>
           <Text style={styles.formulaStyle}>{method.formula}</Text>
-      </ScrollView>
+      </View>
       <Text style={styles.abbravation}>
         <Text>Scr = standardized serum creatinine in mg/dL{'\n'}</Text>
         <Text>κ = 0.7 (females) or 0.9 (males){'\n'}</Text>
@@ -45,12 +45,11 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     width: '98%',
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5,
     padding: 20,
     marginTop: 12,
-    height: '79%'
   },
   heading: {
     fontSize: 20,
@@ -67,12 +66,13 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   linkStyle: {
-    fontWeight: 200,
+    fontWeight: 300,
     fontStyle: 'italic',
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
+    color: 'blue'
   },
   abbravation: {
-    lineHeight: 18,
+    lineHeight: 22,
     color: '#333',
   }
 })
