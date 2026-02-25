@@ -1,5 +1,4 @@
 import { HapticTab } from '@/components/haptic-tab';
-import SplashScreen from '@/components/SplashScreen';
 import HistoryToast from '@/components/toast';
 import { Colors } from '@/constants/theme';
 import { BedsideProvider } from '@/contexts/BedsideContext';
@@ -9,26 +8,15 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { initDatabase } from '@/services/database';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Tabs } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
     initDatabase();
-
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2500);
-
-    return () => clearTimeout(timer);
   }, []);
-
-  if (loading) {
-    return <SplashScreen onFinish={() => setLoading(false)} />;
-  }
 
   return (
     <HistoryProvider>
@@ -43,7 +31,7 @@ export default function TabLayout() {
         tabBarStyle: styles.tabBarStyle
       }}>
       <Tabs.Screen     
-        name="home"
+        name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ focused }) =>           
@@ -65,7 +53,6 @@ export default function TabLayout() {
       <Tabs.Screen name="info" options={{href: null}}/>
       <Tabs.Screen name="ckdmethod" options={{href: null}}/>
       <Tabs.Screen name="bedsideMethod" options={{href: null}}/>
-      <Tabs.Screen name="index" options={{href: null}}/>
     </Tabs>
     <HistoryToast />
     </CDKProvider>
