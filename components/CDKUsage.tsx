@@ -1,9 +1,9 @@
-import methodsandformulas from '@/data/methodsandformulas.json';
-import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import methodsandformulas from "@/data/methodsandformulas.json";
+import React from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 
 const CDKUsage = () => {
-  const method = methodsandformulas.find((m) => m.id === 'ckd');
+  const method = methodsandformulas.find((m) => m.id === "ckd");
   if (!method) return <Text>Method not found!</Text>;
 
   return (
@@ -30,36 +30,36 @@ export default CDKUsage;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    width: '98%',
-    alignSelf: 'center',
+    backgroundColor: "#FFFFFF",
+    width: "98%",
+    alignSelf: "center",
     borderRadius: 10,
     padding: 20,
-    marginTop: 12,
-    shadowColor: '#000',
+    marginTop: 15,
+    shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
-    height: '79%'
+    height: "79%",
   },
 
   title: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#1691E9',
+    fontWeight: "700",
+    color: "#1691E9",
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   itemContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 12,
   },
 
   bullet: {
     fontSize: 16,
-    color: '#1691E9',
+    color: "#1691E9",
     marginRight: 8,
     lineHeight: 22,
   },
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   itemText: {
     flex: 1,
     fontSize: 14,
-    color: '#333',
+    color: "#333",
     lineHeight: 22,
   },
 });

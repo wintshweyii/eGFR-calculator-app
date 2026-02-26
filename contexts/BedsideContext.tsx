@@ -1,13 +1,13 @@
-import { showHistoryToast } from '@/components/toast';
-import grades from '@/data/cdkGrades.json';
-import { db } from '@/services/database';
-import React, { createContext, useContext } from 'react';
+import { showHistoryToast } from "@/components/toast";
+import grades from "@/data/cdkGrades.json";
+import { db } from "@/services/database";
+import React, { createContext, useContext } from "react";
 
 type CalculateParams = {
   height: number;
-  heightUnit: 'cm' | 'inch';
+  heightUnit: "cm" | "inch";
   serumCreatinine: number;
-  unit: 'mg/dL' | 'µmol/L';
+  unit: "mg/dL" | "µmol/L";
 };
 
 type CKDGrade = {
@@ -18,31 +18,25 @@ type CKDGrade = {
 };
 
 type BedsideContextType = {
-  calculateBedsideEGFR: (
-    params: CalculateParams
-  ) => Promise<{
+  calculateBedsideEGFR: (params: CalculateParams) => Promise<{
     egfr: number;
     grade: string;
   }>;
 };
 
-const BedsideContext =
-  createContext<BedsideContextType | undefined>(undefined);
+const BedsideContext = createContext<BedsideContextType | undefined>(undefined);
 
-  export const BedsideProvider = ({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) => {
-
+export const BedsideProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const getGrade = (value: number): string => {
     const found = (grades as CKDGrade[]).find(
-      g => value >= g.min && value <= g.max
+      (g) => value >= g.min && value <= g.max,
     );
 
-    return found
-      ? `${found.grade} (${found.description})`
-      : 'Unknown';
+    return found ? `${found.grade} (${found.description})` : "Unknown";
   };
 
   const saveHistory = async (record: any) => {
@@ -65,8 +59,8 @@ const BedsideContext =
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           record.history_id,
-          null,          // age
-          null,          // sex
+          null,
+          null,
           record.height,
           record.height_unit,
           record.serum_creatinine,
@@ -75,11 +69,11 @@ const BedsideContext =
           record.egfr_result_grade,
           record.calculation_method,
           record.created_at,
-        ]
+        ],
       );
-        showHistoryToast('save');
+      showHistoryToast("save");
     } catch (error) {
-      console.log('SQLite Bedside Save Error:', error);
+      console.log("SQLite Bedside Save Error:", error);
     }
   };
 
@@ -89,16 +83,15 @@ const BedsideContext =
     serumCreatinine,
     unit,
   }: CalculateParams) => {
-
     let heightCM = height;
 
-    if (heightUnit === 'inch') {
+    if (heightUnit === "inch") {
       heightCM = height * 2.54;
     }
 
     let scr = serumCreatinine;
 
-    if (unit === 'µmol/L') {
+    if (unit === "µmol/L") {
       scr = serumCreatinine / 88.4;
     }
 
@@ -115,7 +108,7 @@ const BedsideContext =
       creatinine_unit: unit,
       egfr_result: rounded,
       egfr_result_grade: grade,
-      calculation_method: 'Bedside Schwartz',
+      calculation_method: "Bedside Schwartz",
       created_at: new Date().toISOString(),
     });
 
@@ -126,9 +119,7 @@ const BedsideContext =
   };
 
   return (
-    <BedsideContext.Provider
-      value={{ calculateBedsideEGFR }}
-    >
+    <BedsideContext.Provider value={{ calculateBedsideEGFR }}>
       {children}
     </BedsideContext.Provider>
   );
@@ -138,9 +129,7 @@ export const useBedside = () => {
   const context = useContext(BedsideContext);
 
   if (!context) {
-    throw new Error(
-      'useBedside must be used inside BedsideProvider'
-    );
+    throw new Error("useBedside must be used inside BedsideProvider");
   }
 
   return context;

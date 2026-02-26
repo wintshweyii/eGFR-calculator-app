@@ -8,12 +8,12 @@ type DropdownItem = {
 };
 
 type Props = {
-  data: DropdownItem[];    
+  data: DropdownItem[];
   selectedValue: number | string | null;
   onSelect: (id: number | string | null) => void;
 };
 
-const CustomDropdown = ({data, selectedValue, onSelect }: Props) => {
+const CustomDropdown = ({ data, selectedValue, onSelect }: Props) => {
   return (
     <View style={styles.container}>
       <Dropdown
@@ -45,24 +45,24 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     paddingVertical: 8,
     paddingHorizontal: 10,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 6,
     width: 115,
-    height: 35
+    height: 35,
   },
 
   dropdownContainer: {
     borderRadius: 10,
   },
   selectedText: {
-    color: '#000000',
-    fontSize: 11
+    color: "#000000",
+    fontSize: 11,
   },
   itemContainer: {
-    height: 50
+    height: 50,
   },
   itemText: {
-    color: '#1691E9',
+    color: "#1691E9",
     fontSize: 10,
   },
 });

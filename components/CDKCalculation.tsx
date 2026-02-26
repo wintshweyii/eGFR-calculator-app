@@ -1,23 +1,27 @@
-import { useCDK } from '@/contexts/CKDContext';
-import Octicons from '@expo/vector-icons/Octicons';
-import React, { useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useCDK } from "@/contexts/CKDContext";
+import Octicons from "@expo/vector-icons/Octicons";
+import React, { useRef, useState } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const CDKCalculation = () => {
   const { calculateEGFR } = useCDK();
-
-  const [scr, setScr] = useState('');
-  const [age, setAge] = useState('');
-  const [creatinineUnit, setUnit] = useState<'mg/dL' | 'µmol/L'>('mg/dL');
-  const [gender, setGender] = useState<'Male' | 'Female'>('Male');
+  const [scr, setScr] = useState("");
+  const [age, setAge] = useState("");
+  const [creatinineUnit, setUnit] = useState<"mg/dL" | "µmol/L">("mg/dL");
+  const [gender, setGender] = useState<"Male" | "Female">("Male");
   const [result, setResult] = useState(0);
-  const [grade, setGrade] = useState('');
+  const [grade, setGrade] = useState("");
   const [scrError, setScrError] = useState(false);
   const [ageError, setAgeError] = useState(false);
-  
   const scrInputRef = useRef<TextInput>(null);
   const AgeInputRef = useRef<TextInput>(null);
-
   const handleCalculate = async () => {
     let hasError = false;
 
@@ -49,15 +53,11 @@ const CDKCalculation = () => {
     });
     setResult(egfr);
     setGrade(grade);
-
-    // setScr('');
-    // setAge('');
-    // Keyboard.dismiss();
   };
 
   const clearResult = () => {
     setResult(0);
-    setGrade('');
+    setGrade("");
   };
 
   return (
@@ -80,11 +80,14 @@ const CDKCalculation = () => {
           <TouchableOpacity
             style={styles.unitBtn}
             onPress={() => {
-              setUnit(creatinineUnit === 'mg/dL' ? 'µmol/L' : 'mg/dL');
-              clearResult()
+              setUnit(creatinineUnit === "mg/dL" ? "µmol/L" : "mg/dL");
+              clearResult();
             }}
           >
-            <Text style={styles.unitText}>{creatinineUnit} <Octicons name="arrow-switch" size={12} color="#eaf3fb" /></Text>
+            <Text style={styles.unitText}>
+              {creatinineUnit}{" "}
+              <Octicons name="arrow-switch" size={12} color="#eaf3fb" />
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -102,11 +105,14 @@ const CDKCalculation = () => {
               if (val) setAgeError(false);
             }}
             keyboardType="numeric"
-            // returnKeyType="done"
-            // onSubmitEditing={() => Keyboard.dismiss()}
             placeholder="0"
           />
-          <View style={[styles.unitBtn, {backgroundColor: 'transparent', alignItems: 'flex-start'}]}>
+          <View
+            style={[
+              styles.unitBtn,
+              { backgroundColor: "transparent", alignItems: "flex-start" },
+            ]}
+          >
             <Text style={styles.yearLabel}>Years</Text>
           </View>
         </View>
@@ -116,16 +122,16 @@ const CDKCalculation = () => {
         <Text style={styles.label}>Gender</Text>
         <View style={styles.genderRow}>
           <Pressable
-            style={[
-              styles.genderBtn,
-              gender === 'Male' && styles.genderActive,
-            ]}
-            onPress={() => {setGender('Male'); clearResult()}}
+            style={[styles.genderBtn, gender === "Male" && styles.genderActive]}
+            onPress={() => {
+              setGender("Male");
+              clearResult();
+            }}
           >
             <Text
               style={[
                 styles.genderText,
-                gender === 'Male' && styles.genderTextActive,
+                gender === "Male" && styles.genderTextActive,
               ]}
             >
               Male
@@ -135,14 +141,17 @@ const CDKCalculation = () => {
           <Pressable
             style={[
               styles.genderBtn,
-              gender === 'Female' && styles.genderActive,
+              gender === "Female" && styles.genderActive,
             ]}
-            onPress={() => {setGender('Female'); clearResult()}}
+            onPress={() => {
+              setGender("Female");
+              clearResult();
+            }}
           >
             <Text
               style={[
                 styles.genderText,
-                gender === 'Female' && styles.genderTextActive,
+                gender === "Female" && styles.genderTextActive,
               ]}
             >
               Female
@@ -151,39 +160,36 @@ const CDKCalculation = () => {
         </View>
       </View>
 
-
       <View style={styles.resultBox}>
         <Text style={styles.resultLabel}>eGFR Result:</Text>
-        <Text style={styles.resultValue}>
-          {result} ml/min/1.73 m²
-        </Text>
+        <Text style={styles.resultValue}>{result} ml/min/1.73 m²</Text>
         {grade ? (
-          <Text style={{ marginTop: 6, fontWeight: '500', color: '#1691E9' }}>
+          <Text style={{ marginTop: 6, fontWeight: "500", color: "#1691E9" }}>
             {grade}
           </Text>
         ) : null}
       </View>
 
       <View style={styles.btnRow}>
-        <Pressable
+        <TouchableOpacity
           style={[styles.btn, styles.clearBtn]}
           onPress={() => {
-            setScr('');
-            setAge('');
-            setGender('Male');
+            setScr("");
+            setAge("");
+            setGender("Male");
             setResult(0);
-            setGrade('');
+            setGrade("");
           }}
         >
           <Text style={styles.btnText}>Clear</Text>
-        </Pressable>
+        </TouchableOpacity>
 
-        <Pressable
+        <TouchableOpacity
           style={[styles.btn, styles.calcBtn]}
           onPress={handleCalculate}
         >
           <Text style={styles.btnText}>Calculate</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -195,134 +201,134 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 12
+    paddingTop: 15,
   },
   inputBox: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     height: 80,
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%'
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
   },
   label: {
     fontSize: 16,
     marginBottom: 8,
-    fontWeight: '500',
-    width: 60
+    fontWeight: "500",
+    width: 60,
   },
   inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '90%'
+    flexDirection: "row",
+    alignItems: "center",
+    width: "90%",
   },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#bce2ee',
+    borderColor: "#bce2ee",
     borderRadius: 8,
     padding: 10,
     fontSize: 16,
-    backgroundColor: '#F8FAFF',
-    alignItems: 'center',
-    justifyContent: 'space-around'
+    backgroundColor: "#F8FAFF",
+    alignItems: "center",
+    justifyContent: "space-around",
   },
   errorInput: {
-    borderColor: 'red',
+    borderColor: "red",
   },
   unitBtn: {
     marginLeft: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: '#1691E9',
+    backgroundColor: "#1691E9",
     borderRadius: 8,
     width: 90,
-    alignItems: 'center'
+    alignItems: "center",
   },
   unitText: {
-    color: 'white',
-    fontWeight: '500',
+    color: "white",
+    fontWeight: "500",
   },
   yearLabel: {
-    color: '#1691E9',
-    fontWeight: '700'
+    color: "#1691E9",
+    fontWeight: "700",
   },
   genderBox: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
     height: 100,
-    justifyContent: 'center'
+    justifyContent: "center",
   },
   genderRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 10,
   },
   genderBtn: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#cfe8f9',
+    borderColor: "#cfe8f9",
     borderRadius: 8,
     paddingVertical: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginRight: 10,
   },
   genderActive: {
-    backgroundColor: '#1691E9',
+    backgroundColor: "#1691E9",
   },
   genderText: {
     fontSize: 16,
-    color: '#555',
+    color: "#555",
   },
   genderTextActive: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
   },
   resultBox: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
-    alignItems: 'center',
+    alignItems: "center",
     height: 110,
-    justifyContent: 'center'
+    justifyContent: "center",
   },
   resultLabel: {
     fontSize: 16,
-    color: '#1691E9',
+    color: "#1691E9",
     marginBottom: 5,
   },
   resultValue: {
     fontSize: 28,
-    fontWeight: '700',
-    color: '#1691E9'
+    fontWeight: "700",
+    color: "#1691E9",
   },
   btnRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   btn: {
     flex: 1,
     paddingVertical: 15,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginHorizontal: 5,
-    justifyContent: 'center',
-    height: 50
+    justifyContent: "center",
+    height: 50,
   },
   clearBtn: {
-    backgroundColor: '#1691E9',
+    backgroundColor: "#1691E9",
   },
   calcBtn: {
-    backgroundColor: '#1691E9',
+    backgroundColor: "#1691E9",
   },
   btnText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
     fontSize: 16,
   },
 });

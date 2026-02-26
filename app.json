@@ -7,23 +7,25 @@
     "icon": "./assets/images/kidney-logo.png",
     "scheme": "egfrcalculatorapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+
     "ios": {
       "supportsTablet": true
     },
+
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/kidney-logo.png",
         "backgroundColor": "#E6F0FA"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.wintshweyii.eGFRCalculatorApp"
     },
+
     "web": {
       "output": "static",
       "favicon": "./assets/images/kidney-logo.png"
     },
+
     "plugins": [
       "expo-router",
       [
@@ -42,10 +44,12 @@
       "expo-sqlite",
       "@react-native-community/datetimepicker"
     ],
+
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
+
     "extra": {
       "router": {},
       "eas": {
