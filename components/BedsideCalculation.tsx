@@ -1,6 +1,7 @@
 import { useBedside } from '@/contexts/BedsideContext';
+import Octicons from '@expo/vector-icons/Octicons';
 import React, { useRef, useState } from 'react';
-import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const BedsideCalculation = () => {
   const { calculateBedsideEGFR } = useBedside();
@@ -73,19 +74,17 @@ const BedsideCalculation = () => {
               if (val) setScrError(false);
             }}
             keyboardType="numeric"
-            returnKeyType="done"
-            onSubmitEditing={() => Keyboard.dismiss()}
             placeholder="0"
           />
-          <Pressable
+          <TouchableOpacity
             style={styles.unitBtn}
             onPress={() => {
               setCreatinineUnit(creatinineUnit === 'mg/dL' ? 'µmol/L' : 'mg/dL');
               clearResult();
             }}
           >
-            <Text style={styles.unitText}>{creatinineUnit} ▼</Text>
-          </Pressable>
+            <Text style={styles.unitText}>{creatinineUnit} <Octicons name="arrow-switch" size={12} color="#eaf3fb" /></Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -102,19 +101,17 @@ const BedsideCalculation = () => {
               if (val) setHeightError(false);
             }}
             keyboardType="numeric"
-            returnKeyType="done"
-            onSubmitEditing={() => Keyboard.dismiss()}
             placeholder="0"
           />
-          <Pressable
+          <TouchableOpacity
             style={styles.unitBtn}
             onPress={() => {
               setHeightUnit(heightUnit === 'cm' ? 'inch' : 'cm');
               clearResult();
             }}
           >
-            <Text style={styles.unitText}>{heightUnit} ▼</Text>
-          </Pressable>
+            <Text style={styles.unitText}>{heightUnit} <Octicons name="arrow-switch" size={12} color="#eaf3fb" /></Text>
+          </TouchableOpacity>
 
         </View>
       </View>
@@ -128,7 +125,8 @@ const BedsideCalculation = () => {
       </View>
 
       <View style={styles.btnRow}>
-        <Pressable style={styles.btn} onPress={() => {
+        <TouchableOpacity style={styles.btn} 
+        onPress={() => {
           setScr('');
           setHeight('');
           setResult(0);
@@ -139,11 +137,11 @@ const BedsideCalculation = () => {
           setHeightError(false);
         }}>
           <Text style={styles.btnText}>Clear</Text>
-        </Pressable>
+        </TouchableOpacity>
 
-        <Pressable style={styles.btn} onPress={handleCalculate}>
+        <TouchableOpacity style={styles.btn} onPress={handleCalculate}>
           <Text style={styles.btnText}>Calculate</Text>
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );

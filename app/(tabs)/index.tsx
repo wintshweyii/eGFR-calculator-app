@@ -7,7 +7,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 export default function HomeScreen() {
   return (
     <View style={styles.container}>  
-      <HeaderComponent text={<AntDesign name="info-circle" size={20} color={'#b5bcbe'}/>} onAboutPress={() => router.push('/info')}/>  
+      <HeaderComponent text={<AntDesign name="info-circle" size={20} color={'#8BC6F0'}/>} onAboutPress={() => router.push('/info')}/>  
     <View style={styles.containerHolder}>
       <Pressable
         style={styles.card}

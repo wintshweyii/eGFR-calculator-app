@@ -1,6 +1,7 @@
 import { useCDK } from '@/contexts/CKDContext';
+import Octicons from '@expo/vector-icons/Octicons';
 import React, { useRef, useState } from 'react';
-import { Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const CDKCalculation = () => {
   const { calculateEGFR } = useCDK();
@@ -61,7 +62,6 @@ const CDKCalculation = () => {
 
   return (
     <View style={styles.container}>
-
       <View style={styles.inputBox}>
         <Text style={styles.label}>S cr</Text>
         <View style={styles.inputRow}>
@@ -75,19 +75,17 @@ const CDKCalculation = () => {
               if (val) setScrError(false);
             }}
             keyboardType="numeric"
-            returnKeyType="done"
-            onSubmitEditing={() => Keyboard.dismiss()}
             placeholder="0"
           />
-          <Pressable
+          <TouchableOpacity
             style={styles.unitBtn}
             onPress={() => {
               setUnit(creatinineUnit === 'mg/dL' ? 'µmol/L' : 'mg/dL');
               clearResult()
             }}
           >
-            <Text style={styles.unitText}>{creatinineUnit} ▼</Text>
-          </Pressable>
+            <Text style={styles.unitText}>{creatinineUnit} <Octicons name="arrow-switch" size={12} color="#eaf3fb" /></Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -104,12 +102,12 @@ const CDKCalculation = () => {
               if (val) setAgeError(false);
             }}
             keyboardType="numeric"
-            returnKeyType="done"
-            onSubmitEditing={() => Keyboard.dismiss()}
+            // returnKeyType="done"
+            // onSubmitEditing={() => Keyboard.dismiss()}
             placeholder="0"
           />
-          <View style={styles.unitBtn}>
-            <Text style={styles.unitText}>Years</Text>
+          <View style={[styles.unitBtn, {backgroundColor: 'transparent', alignItems: 'flex-start'}]}>
+            <Text style={styles.yearLabel}>Years</Text>
           </View>
         </View>
       </View>
@@ -248,6 +246,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '500',
   },
+  yearLabel: {
+    color: '#1691E9',
+    fontWeight: '700'
+  },
   genderBox: {
     backgroundColor: 'white',
     borderRadius: 12,
@@ -263,7 +265,7 @@ const styles = StyleSheet.create({
   genderBtn: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#CDEAD5',
+    borderColor: '#cfe8f9',
     borderRadius: 8,
     paddingVertical: 10,
     alignItems: 'center',

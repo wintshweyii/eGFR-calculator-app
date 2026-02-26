@@ -3,9 +3,10 @@ import BedsideFormula from '@/components/BedsideFormula'
 import BedsideUsage from '@/components/BedsideUsage'
 import HeaderComponent from '@/components/header'
 import TabButton from '@/components/TabButton'
-import { Stack } from 'expo-router'
+import AntDesign from '@expo/vector-icons/AntDesign'
+import { router, Stack } from 'expo-router'
 import React, { useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Keyboard, Pressable, StyleSheet, View } from 'react-native'
 
 const BedsideMethod = () => {
   const [activeTab, setActiveTab] = useState<'calc' | 'usage' | 'formula'>('calc')
@@ -22,9 +23,9 @@ const BedsideMethod = () => {
   }
 
   return (
-    <>
+    <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss}>
     <View style={styles.container}>
-    <HeaderComponent />
+    <HeaderComponent text={<AntDesign name="info-circle" size={20} color={'#8BC6F0'}/>} onAboutPress={() => router.push('/info')}/>
       <Stack.Screen
         options={{
           title: 'Bedside',
@@ -55,7 +56,7 @@ const BedsideMethod = () => {
           {renderContent()}
         </View>
       </View>
-    </>
+    </Pressable>
   )
 }
 

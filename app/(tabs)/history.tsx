@@ -4,12 +4,11 @@ import Search from '@/components/search';
 import { useHistory } from '@/contexts/historyContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
-import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const History = () => {
 
@@ -82,30 +81,45 @@ const History = () => {
     <View style={{ backgroundColor: '#E6F0FA', flex: 1 }}>
 
       <HeaderComponent
-        text={<AntDesign name="info-circle" size={20} color={'#b5bcbe'} />}
+        text={<AntDesign name="info-circle" size={20} color={'#8BC6F0'} />}
         onAboutPress={() => router.push('/info')}
       />
 
       <View style={styles.container}>
 
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <Text style={{ fontSize: 20 }}>EGFR History</Text>
           <Text style={{ color: '#3FA1E8' }}>
             Your past kidney health
           </Text>
-        </View>
+        </View> */}
 
         <Search />
 
+        {history.length > 0 && (
         <View style={styles.resultCountContainer}>
-          <Text style={styles.resultCountText}>
-            <Text style={styles.resultCount}>{history.length}</Text> Result{history.length !== 1 ? 's' : ''} Found
-          </Text>
           <View style={{flexDirection: 'row'}}>
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={styles.resultCountText}>
+                {' '}Histor{history.length !== 1 ? 'ies' : 'y'} Found 
+              </Text> 
+            </View>  
+            <View style={styles.countBadge}>
+              <Text style={styles.countBadgeText}>
+                {history.length}
+              </Text>
+            </View>
+          </View>     
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Pressable style={{paddingRight: 4}}>
               <Entypo name="export" size={20} color="#1691E9" onPress={exportAllHistory}/>
+            </Pressable>
+            <Pressable>
               <MaterialIcons name="delete-outline" size={20} color="#1691E9" onPress={handleDeleteAll}/>
+            </Pressable>
           </View>
         </View>
+        )}
 
         <ScrollView 
           style={styles.resultContainer}
@@ -114,8 +128,8 @@ const History = () => {
         >
 
           {history.length === 0 ? (
-            <Text style={{ textAlign: 'center', padding: 20 }}>
-              {/* No history available */}
+            <Text style={styles.nohistoryTxt}>
+              No history to display
             </Text>
           ) : (
             history.map((item) => (
@@ -131,8 +145,12 @@ const History = () => {
                     {formatDate(item.created_at)}
                   </Text>
                   <View style={{ flexDirection: 'row', gap: 2}}>
-                    <Feather name="save" size={18} color="#848488" onPress={() => exportSingleHistory(item.history_id)}/>
-                    <MaterialIcons name="delete-outline" size={20} color="#848488" onPress={() => handleDelete(item.history_id)}/>
+                    <Pressable style={{paddingRight: 2}}>
+                      <Entypo name="export" size={18} color="#848488" onPress={() => exportSingleHistory(item.history_id)}/>
+                    </Pressable>
+                    <Pressable>
+                      <MaterialIcons name="delete-outline" size={18} color="#848488" onPress={() => handleDelete(item.history_id)}/>
+                    </Pressable>                 
                   </View>
                 </View>     
                 <View style={styles.secondPart}>
@@ -222,8 +240,8 @@ export default History;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: '5%',
-    marginTop: '35%',
+    marginHorizontal: '3%',
+    marginTop: '40%',
     marginBottom: '20%'
   },
   header: {
@@ -234,7 +252,7 @@ const styles = StyleSheet.create({
   resultContainer: {
     borderRadius: 10,
     padding: 8,
-    width: '94%',
+    width: '100%',
     margin: 'auto',
     marginBottom: 20
   },
@@ -316,5 +334,28 @@ resultCount: {
   color: '#1691E9',
   fontWeight: '700',
   // backgroundColor: '#1691E9',
+},
+nohistoryTxt: {
+  textAlign: 'center',
+  padding: 20,
+  fontStyle: 'italic',
+  color: '#6c757d',
+  fontSize: 16,
+  fontWeight: 500,
+  marginTop: 20
+},
+countBadge: {
+  marginLeft: 10,
+  backgroundColor: '#0a81d6',
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 5,
+  alignItems: 'center',
+},
+
+countBadgeText: {
+  color: 'white',
+  fontWeight: '700',
+  fontSize: 14,
 },
 })

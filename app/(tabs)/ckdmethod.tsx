@@ -6,7 +6,7 @@ import TabButton from '@/components/TabButton'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { router, Stack } from 'expo-router'
 import React, { useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Keyboard, Pressable, StyleSheet, View } from 'react-native'
 
 const CKDMethod = () => {
   const [activeTab, setActiveTab] = useState<'calc' | 'usage' | 'formula'>('calc')
@@ -23,9 +23,9 @@ const CKDMethod = () => {
   }
 
   return (
-    <>
+    <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss}>
     <View style={styles.container}>
-      <HeaderComponent text={<AntDesign name="info-circle" size={20} color={'#b5bcbe'}/>} onAboutPress={() => router.push('/info')}/>  
+      <HeaderComponent text={<AntDesign name="info-circle" size={20} color={'#8BC6F0'}/>} onAboutPress={() => router.push('/info')}/>  
       <Stack.Screen
         options={{
           title: 'CKD–EPI 2021',
@@ -56,7 +56,7 @@ const CKDMethod = () => {
           {renderContent()}
         </View>
       </View>
-    </>
+    </Pressable>
   )
 }
 

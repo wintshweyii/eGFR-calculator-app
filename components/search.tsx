@@ -27,8 +27,8 @@ const Search = () => {
   };
 
   const formatDate = (date?: Date) =>
-    date ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` : '--/--/----';
-
+    date ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` : 'dd/mm/yyyy';
+  
   return (
     <View style={styles.container}>
 
@@ -81,7 +81,6 @@ const Search = () => {
         />
       )}
 
-      {/* End Date Picker */}
       {showEndPicker && (
         <DateTimePicker
           value={toDate || new Date()}
@@ -133,8 +132,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingVertical: 8,
     paddingHorizontal: 10,
-    alignItems: 'center',
-    width: '70%'
+    // alignItems: 'center',
+    justifyContent: 'center',
+    width: '70%',
+    height: 35
   },
   methodDropdownCompact: {
     flex: 3,
@@ -144,8 +145,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10
   },
   inputText: {
-    color: '#333',
+    color: '#6c757d',
     fontSize: 12,
+    fontStyle: 'italic',
   },
   // buttonRow: {
   //   flexDirection: 'row',
@@ -159,7 +161,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     alignItems: 'center',
-    height: 30
+    height: 35,
+    justifyContent: 'center'
   },
   searchButton: { 
     backgroundColor: '#1691E9', 
