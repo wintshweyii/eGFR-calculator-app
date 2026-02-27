@@ -10,6 +10,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -17,6 +18,8 @@ export default function TabLayout() {
   useEffect(() => {
     initDatabase();
   }, []);
+
+  const insets = useSafeAreaInsets();
 
   return (
     <HistoryProvider>
@@ -28,7 +31,7 @@ export default function TabLayout() {
               headerShown: false,
               tabBarButton: HapticTab,
               tabBarShowLabel: false,
-              tabBarStyle: styles.tabBarStyle,
+              tabBarStyle: [styles.tabBarStyle, {bottom: insets.bottom + 5,}]
             }}
           >
             <Tabs.Screen
@@ -82,7 +85,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     height: 60,
     position: "absolute",
-    bottom: 25,
     marginRight: 80,
     marginLeft: 80,
     borderRadius: 30,

@@ -123,11 +123,11 @@ const Search = () => {
             style={[styles.button, styles.resetButton]}
             onPress={handleReset}
           >
-            <Text style={styles.buttonText}>
+            <Text style={[styles.buttonText, {color: "#1691E9"}]}>
               <Octicons
                 name="filter-remove"
                 size={12}
-                color="white"
+                color="#1691E9"
               />{' '}
               Reset
             </Text>
@@ -256,7 +256,9 @@ const styles = StyleSheet.create({
   },
 
   resetButton: {
-    backgroundColor: '#1691E9',
+    backgroundColor: '#ffffff',
+    borderColor: '#64b5f0',
+    borderWidth: 1
   },
 
   buttonText: {

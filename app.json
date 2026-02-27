@@ -1,13 +1,12 @@
 {
   "expo": {
-    "name": "eGFR-Calculator-App",
+    "name": "eGFR Calculator App",
     "slug": "eGFR-Calculator-App",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/kidney-logo.png",
+    "icon": "./assets/images/kidneys.png",
     "scheme": "egfrcalculatorapp",
     "userInterfaceStyle": "automatic",
-
     "ios": {
       "supportsTablet": true
     },
@@ -15,7 +14,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/kidney-logo.png",
-        "backgroundColor": "#E6F0FA"
+        "backgroundColor": "#eaf3fb"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.wintshweyii.eGFRCalculatorApp"
@@ -31,12 +30,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/kidneys.png",
+          "image": "./assets/images/kidney-logo.png",
           "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#E6F0FA",
+          "backgroundColor": "#eaf3fb",
           "dark": {
-            "backgroundColor": "#E6F0FA"
+            "backgroundColor": "#eaf3fb"
           }
         }
       ],

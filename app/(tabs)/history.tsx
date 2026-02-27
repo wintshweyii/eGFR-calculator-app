@@ -115,14 +115,14 @@ const History = () => {
 
             <View style={{ flexDirection: "row" }}>
               <Pressable onPress={exportAllHistory}>
-                <Entypo name="export" size={20} color="#1691E9" />
+                <Entypo name="export" size={25} color="#1691E9" />
               </Pressable>
 
               <Pressable style={{ marginLeft: 10 }} onPress={handleDeleteAll}>
                 <MaterialIcons
                   name="delete-outline"
-                  size={20}
-                  color="#1691E9"
+                  size={25}
+                  color="#e71f44"
                 />
               </Pressable>
             </View>
@@ -224,8 +224,8 @@ const History = () => {
                         handleDelete(item.history_id);
                       }}
                     >
-                      <Feather name="trash-2" size={18} color="red" />
-                      <Text style={[styles.menuText, { color: "red" }]}>
+                      <MaterialIcons name="delete-outline" size={18} color="#e71f44" />
+                      <Text style={[styles.menuText, { color: "#e71f44" }]}>
                         Delete
                       </Text>
                     </TouchableOpacity>
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   },
 
   resultCountText: {
-    fontSize: 13,
+    fontSize: 15,
     // color: '#1691E9',
     fontWeight: "500",
   },

@@ -76,6 +76,7 @@ const CDKCalculation = () => {
             }}
             keyboardType="numeric"
             placeholder="0"
+            placeholderTextColor="#999"
           />
           <TouchableOpacity
             style={styles.unitBtn}
@@ -106,6 +107,7 @@ const CDKCalculation = () => {
             }}
             keyboardType="numeric"
             placeholder="0"
+            placeholderTextColor="#999"
           />
           <View
             style={[
@@ -181,7 +183,7 @@ const CDKCalculation = () => {
             setGrade("");
           }}
         >
-          <Text style={styles.btnText}>Clear</Text>
+          <Text style={[styles.btnText, {color: "#1691E9"}]}>Clear</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -321,7 +323,9 @@ const styles = StyleSheet.create({
     height: 50,
   },
   clearBtn: {
-    backgroundColor: "#1691E9",
+    backgroundColor: "#ffffff",
+    borderColor: "#64b5f0",
+    borderWidth: 1
   },
   calcBtn: {
     backgroundColor: "#1691E9",

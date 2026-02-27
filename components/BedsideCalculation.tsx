@@ -79,6 +79,7 @@ const BedsideCalculation = () => {
             }}
             keyboardType="numeric"
             placeholder="0"
+            placeholderTextColor="#999"
           />
           <TouchableOpacity
             style={styles.unitBtn}
@@ -111,6 +112,7 @@ const BedsideCalculation = () => {
             }}
             keyboardType="numeric"
             placeholder="0"
+            placeholderTextColor="#999"
           />
           <TouchableOpacity
             style={styles.unitBtn}
@@ -139,7 +141,7 @@ const BedsideCalculation = () => {
 
       <View style={styles.btnRow}>
         <TouchableOpacity
-          style={styles.btn}
+          style={[styles.btn, styles.clearBtn]}
           onPress={() => {
             setScr("");
             setHeight("");
@@ -151,7 +153,7 @@ const BedsideCalculation = () => {
             setHeightError(false);
           }}
         >
-          <Text style={styles.btnText}>Clear</Text>
+          <Text style={[styles.btnText, {color: "#1691E9"}]}>Clear</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.btn} onPress={handleCalculate}>
@@ -265,4 +267,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
+  clearBtn: {
+    backgroundColor: "#ffffff",
+    borderColor: "#64b5f0",
+    borderWidth: 1
+  }
 });

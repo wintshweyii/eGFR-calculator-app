@@ -163,7 +163,7 @@ export const HistoryProvider = ({
 
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
       await Sharing.shareAsync(uri);
-      showHistoryToast("export");
+      // showHistoryToast("export");
     } catch (error) {
       console.error("Export PDF Error:", error);
       Alert.alert("Error", "Failed to export history item.");
@@ -204,7 +204,7 @@ export const HistoryProvider = ({
 
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
       await Sharing.shareAsync(uri);
-      showHistoryToast("exportAll");
+      // showHistoryToast("exportAll");
     } catch (error) {
       console.error("Export All PDF Error:", error);
       Alert.alert("Error", "Failed to export history.");
