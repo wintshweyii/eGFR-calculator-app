@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#eaf3fb",
     padding: 16,
+    marginTop: -30
   },
 
   tabContainer: {
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
     width: "88%",
     marginLeft: "auto",
     marginRight: "auto",
-    marginTop: "5%",
+    marginTop: "13%",
   },
   contentCard: {
     borderRadius: 12,
