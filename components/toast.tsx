@@ -2,12 +2,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import Toast from "react-native-toast-message";
 
-export type HistoryAction =
-  | "save"
-  | "delete"
-  | "deleteAll";
-  // | "export"
-  // | "exportAll";
+export type HistoryAction = "save" | "delete" | "deleteAll";
 
 export const showHistoryToast = (action: HistoryAction) => {
   switch (action) {
@@ -38,24 +33,6 @@ export const showHistoryToast = (action: HistoryAction) => {
         visibilityTime: 2500,
       });
       break;
-    // case "export":
-    //   Toast.show({
-    //     type: "success",
-    //     text1: "History Exported 📤",
-    //     text2: "The history record has been exported successfully.",
-    //     position: "bottom",
-    //     visibilityTime: 2500,
-    //   });
-    //   break;
-    // case "exportAll":
-    //   Toast.show({
-    //     type: "success",
-    //     text1: "All History Exported 📤",
-    //     text2: "All history records have been exported successfully.",
-    //     position: "bottom",
-    //     visibilityTime: 2500,
-    //   });
-    //   break;
     default:
       break;
   }
